@@ -4,7 +4,12 @@
  */
 
 var express = require('express');
-
+var redis = require("redis"),
+    client = redis.createClient();
+client.on("error", function (err) {
+    console.log("Error " + err);
+});
+		
 var app = module.exports = express.createServer();
 
 // Configuration
@@ -41,3 +46,14 @@ if (!module.parent) {
   app.listen(3000);
   console.log("Express server listening on port %d", app.address().port);
 }
+
+
+//listen for remote button post
+//
+
+app.post('/', function(req, res){
+    console.log(req.body.user);
+});
+
+
+
