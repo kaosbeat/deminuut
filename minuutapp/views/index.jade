@@ -1,10 +1,17 @@
 #remote
 	h1 remote control
+	p
 		ul.programlist
-			li.program benidorm bastards
+			li.program#bb benidorm bastards
+				button.startbutton start
 			li.program iets met bart kaëll
+				.startbutton start
 			li.program iets met luk appermont
+				.startbutton start
 			li.program iets dat ge echt niet wilt zien
+				.startbutton start
+	form(method="post", action="/")
+		input(type="text", name="user")
 
 #button
 	h1 share een minuut
@@ -12,11 +19,12 @@
 
 #list
 	h1 gedeelde fragmenten
+	p
 		ul.sharelist
 			li.fragment dat fragment met bart appermont
 			li.fragment dat fragment met benidorm appermont
 
 #watch
-	#video
-	#metadata
-	#reclamebuttons 
+	#video video
+	#metadata metadata
+	#reclamebuttons reclame
