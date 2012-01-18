@@ -2,9 +2,14 @@ $(document).ready ->
 	console.log "blah"
 	
 	$('.startbutton').click () ->
-		console.log $(this).parent().attr('id')
-		
-
+		video = $(this).parent().attr('id')
+		console.log video
+		user = $("#username").val()
+		data = {video: video, user: user}
+		$.post('/', data, (data)
+			console.log data
+		)
+		console.log ("shouldbeposted")
 
 #
 #
