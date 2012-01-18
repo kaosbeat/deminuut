@@ -40,6 +40,14 @@ app.get('/', function(req, res){
   });
 });
 
+app.get('/eerstescherm', function(req, res){
+  console.log(req.query);
+  res.render('eerstescherm', {
+    title: 'Express'
+  });
+});
+
+
 // Only listen on $ node app.js
 
 if (!module.parent) {
@@ -53,6 +61,7 @@ if (!module.parent) {
 
 app.post('/', function(req, res){
     console.log(req.body.user);
+		console.log(req.body.video);
 });
 
 
