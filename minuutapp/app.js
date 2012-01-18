@@ -9,6 +9,16 @@ var redis = require("redis"),
 client.on("error", function (err) {
     console.log("Error " + err);
 });
+
+
+var pubnub  = require("pubnub");
+var network = pubnub.init({
+    publish_key   : "pub-7b2681ab-27d3-47dc-8278-15aa1d8bfb57",
+    subscribe_key : "sub-6bee67b8-41be-11e1-99f4-754603d9dc6f",
+    secret_key    : "",
+    ssl           : false,
+    origin        : "pubsub.pubnub.com"
+});
 		
 var app = module.exports = express.createServer();
 var sockjs = require('sockjs');
@@ -65,6 +75,17 @@ app.post('/', function(req, res){
     console.log(req.body.user);
 		console.log(req.body.video);
 		client.hmset("vid:2", "starttime", "44455362", "user", req.body.user, "video", req.body.video);
+    network.publish({
+            channel  : "vtm",
+            message  : {"video" : req.body.video},
+            callback : function(info){
+                if (!info[0]) console.log("Failed Message Delivery")
+
+                console.log(info);
+
+                
+            }
+    });
 		
 });
 
