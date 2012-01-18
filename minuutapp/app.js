@@ -22,7 +22,9 @@ var network = pubnub.init({
 		
 var app = module.exports = express.createServer();
 var sockjs = require('sockjs');
-var sockjs_opts = {sockjs_url: "http://cdn.sockjs.org/sockjs-0.1.min.js"};
+var sockjs_opts = {sockjs_url: "http://cdn.sockjs.org/sockjs-0.1.min.js", prefix:'[/]echo'};
+var sockjs_echo = sockjs.createServer(sockjs_opts);
+
 
 // Configuration
 
@@ -64,7 +66,16 @@ app.get('/eerstescherm', function(req, res){
 
 if (!module.parent) {
   app.listen(3000);
+	sockjs_echo.installHandlers(app, sockjs_opts);
   console.log("Express server listening on port %d", app.address().port);
+	sockjs_echo.on('connection', function(conn) {
+   conn.on('data', function(message) {
+      conn.write(message);
+			console.log(message);
+   });
+});
+
+
 }
 
 
