@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>De Minuut</title>
+	
+	<meta name = "viewport" content = "width = device-width">
+	<meta name = "viewport" content = "initial-scale = 1.0, user-scalable = no"> 
+	
+	<link rel="stylesheet" href="./stylesheets/reset.css" />
+	<link rel="stylesheet" href="./stylesheets/index.css" />
+	
+	<script type="text/javascript" src="./javascripts/jquery-1.6.4.min.js"></script>
+	<script type="text/javascript" src="./javascripts/jquery.tmpl.min.js"></script>
+	<script type="text/javascript" src="./javascripts/jquery.animate-enhanced.min.js"></script>
+	<script type="text/javascript" src="./javascripts/underscore.js"></script>
+	<script type="text/javascript" src="./javascripts/backbone.js"></script>
+	
+	<script type="text/javascript" src="./javascripts/index.js"></script>
+	<script type="text/javascript" src="./javascripts/routers/router.js"></script>
+	<script type="text/javascript" src="./javascripts/views/navigationview.js"></script>
+	<script type="text/javascript" src="./javascripts/views/mainview.js"></script>
+	<script type="text/javascript" src="./javascripts/views/remotecontrolview.js"></script>
+	<script type="text/javascript" src="./javascripts/views/shareview.js"></script>
+	<script type="text/javascript" src="./javascripts/views/shareditemsview.js"></script>
+	<script type="text/javascript" src="./javascripts/views/fragmentitem.js"></script>
+	<script type="text/javascript" src="./javascripts/views/shareditemview.js"></script>
+	<script type="text/javascript" src="./javascripts/models/fragment.js"></script>
+	<script type="text/javascript" src="./javascripts/collections/fragmentlist.js"></script>
+	<script type="text/javascript" src="./javascripts/models/shareditem.js"></script>
+	<script type="text/javascript" src="./javascripts/collections/shareditemlist.js"></script>
+	
+	<script id="shareditem-template" type="text/x-jquery-tmpl">
+		<div class="title">${title}</div>
+		<div class="user">${user}</div>
+		<div class="comment">${comment}</div>
+	</script>
+</head>
+<body>
+	<header>De Minuut</header>
+	
+	<div class="mainview" id="mainview-remotecontrol">
+		<ul>
+		</ul>
+	</div>
+	
+	<div class="mainview" id="mainview-share">
+		<textarea rows="5" placeholder="commentaar"></textarea>
+		<br />
+		<button>Deel deze minuut</button>
+	</div>
+	
+	<div class="mainview" id="mainview-shareditems">
+		<ul>
+		</ul>
+	</div>
+	
+	<nav>
+		<div class="item" id="remotecontrol">afstands-bediening</div>
+		<div class="item" id="share">deel een fragment</div>
+		<div class="item" id="shareditems">gedeelde fragmenten</div>
+	</nav>
+</body>
+</html>

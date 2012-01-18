@@ -1,0 +1,119 @@
+html,body{
+	position: relative;
+	font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+	font-size: 10px;
+	color: #333333;
+	border:none;
+	background-color: #EDECED;
+}
+
+input,select,textarea{
+	background-size: 100% 100%;
+	color: #666;
+	border: 1px solid #ccc;
+	font-weight: bold;
+	font-size: 15px;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	padding: 5px;
+}
+
+button{
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
+	padding: 2px 4px;
+	cursor: pointer;
+	font-size: 11px;
+	font-weight: bold;
+	min-height: 32px;
+	min-width: 32px;
+	text-align: center;
+	border: none;
+}
+
+body{
+	width: 100%;
+	height: 100%;
+}
+	
+	
+
+header, nav{
+	background-color: #333333;
+	color: #F7F7F4;	
+	width: 100%;
+}
+
+header{
+	padding-top: 10px;
+	padding-bottom: 10px;
+	text-align: center;
+	font-size: 18px;	
+}
+
+.mainview{
+	margin-bottom: 50px;
+	display: none; /* standaard hiden */
+}
+
+.mainview>ul>li{
+	font-size: 14px;
+	border-bottom: 1px solid #AAA;
+	padding: 10px;
+	cursor: pointer;
+}
+
+#mainview-share{
+	padding-top: 20px;
+	text-align: center;	
+}
+
+
+#mainview-share>textarea{
+	width: 90%;	
+}
+
+
+#mainview-share>button{
+	margin-top: 10px;
+	background: #DD4B39;
+	color: #F7F7F4;
+}
+
+#mainview-shareditems>ul>li{
+}
+
+#mainview-shareditems>ul>li>.title{
+	float: left;
+	font-weight: bold;
+}
+
+#mainview-shareditems>ul>li>.user{
+	float: right;
+	font-weight: bold;
+	color: #898989;
+}
+
+#mainview-shareditems>ul>li>.comment{
+	padding-top: 5px;
+	clear: both;
+	color: #898989;
+}
+
+nav{
+	position: fixed;
+	bottom: 0px;
+	height: 40px;	
+	text-align: center;
+}
+
+nav>.item{
+	display: inline-block;
+	width: 60px;
+	height: 100%;
+	cursor: pointer;
+	padding: 10px;
+	background-color: #444444;
+}
