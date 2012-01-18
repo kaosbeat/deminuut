@@ -1,4 +1,6 @@
 App.Router = Backbone.Router.extend({
+	currentFragment: null,
+	
 	routes: {
 		'': 'defaultRoute',
 		'remotecontrol/' : 'showRemoteControlView',

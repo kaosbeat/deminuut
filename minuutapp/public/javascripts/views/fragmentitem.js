@@ -11,6 +11,7 @@ App.FragmentItem = Backbone.View.extend({
 	},
 	
 	this_click: function(event){
+		App.router.currentFragment = this.model;
 		console.log("will show '" + this.model.id + "' on first screen");
 	}
 });

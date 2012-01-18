@@ -6,6 +6,15 @@ App.ShareView = App.MainView.extend({
 	},
 	
 	sharebutton_clickHandler: function(event){
-		console.log("sharing this minute with comment: '" + this.$("textarea").val());
+		/*
+		$.post("/", {
+				comment: this.$("textarea").val()
+			},
+				function(data) {
+					console.dir(data);
+				}
+		);
+		*/
+		console.log("sharing '" + App.router.currentFragment.get("title") + "' with comment: '" + this.$("textarea").val());
 	}
 });
