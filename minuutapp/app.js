@@ -11,6 +11,8 @@ client.on("error", function (err) {
 });
 		
 var app = module.exports = express.createServer();
+var sockjs = require('sockjs');
+var sockjs_opts = {sockjs_url: "http://cdn.sockjs.org/sockjs-0.1.min.js"};
 
 // Configuration
 
@@ -36,14 +38,14 @@ app.configure('production', function(){
 
 app.get('/', function(req, res){
   res.render('index', {
-    title: 'Express'
+    script: 'remote'
   });
 });
 
 app.get('/eerstescherm', function(req, res){
   console.log(req.query);
   res.render('eerstescherm', {
-    title: 'Express'
+    script: 'eerstescherm'
   });
 });
 

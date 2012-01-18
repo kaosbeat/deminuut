@@ -1,8 +1,10 @@
 !!!
 html
 	head
-		title= title
+		title blah 
 		link(rel='stylesheet', href='/stylesheets/style.css')
 		script(src='/javascripts/jquery-1.6.4.min.js')
-		script(src='/javascripts/remote.js')
+		script(src='http://cdn.sockjs.org/sockjs-0.1.min.js')
+		script(src='/javascripts/#{script}.js')
 	body!= body
+			
