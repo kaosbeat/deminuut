@@ -21,8 +21,7 @@ var network = pubnub.init({
 });
 		
 var app = module.exports = express.createServer();
-var sockjs = require('sockjs');
-var sockjs_opts = {sockjs_url: "http://cdn.sockjs.org/sockjs-0.1.min.js"};
+
 
 // Configuration
 
@@ -82,8 +81,6 @@ app.post('/', function(req, res){
                 if (!info[0]) console.log("Failed Message Delivery")
 
                 console.log(info);
-
-                
             }
     });
 		
