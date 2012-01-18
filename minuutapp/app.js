@@ -5,7 +5,7 @@
 
 var express = require('express');
 var redis = require("redis"),
-    client = redis.createClient();
+		client = redis.createClient();
 client.on("error", function (err) {
     console.log("Error " + err);
 });
@@ -62,6 +62,8 @@ if (!module.parent) {
 app.post('/', function(req, res){
     console.log(req.body.user);
 		console.log(req.body.video);
+		client.hmset("vid:2", "starttime", "44455362", "user", req.body.user, "video", req.body.video);
+		
 });
 
 
