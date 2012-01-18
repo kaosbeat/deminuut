@@ -1,5 +1,4 @@
 (function() {
-
   $(document).ready(function() {
     return PUBNUB.subscribe({
       channel: "vtm",
@@ -14,5 +13,4 @@
       }
     });
   });
-
 }).call(this);
