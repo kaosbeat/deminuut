@@ -1,4 +1,4 @@
-$(function(event){
+﻿$(function(event){
 	App.start();
 });
 
