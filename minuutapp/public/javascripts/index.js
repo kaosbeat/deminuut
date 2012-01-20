@@ -23,9 +23,11 @@ window.App = {
 		
 		//Add some fragments to the fragmentList (komt normaal van server):
 		App.fragments.add([
-		    {id:"benidorm", title: "Benidorm Bastards", url:"http://champ.vrtmedialab.be/videos/benidormb.m4v"},
-			{id:"bigbuck", title: "Big Buck Bunny", url:"http://ftp.akl.lt/Video/Big_Buck_Bunny/big_buck_bunny_480p_h264.mov"},
-			{id:"demo", title: "Demo", url:"http://media.w3.org/2010/05/sintel/trailer.mp4"}
+		    {title: "Benidorm Bastards", url:"http://champ.vrtmedialab.be/videos/benidormb.m4v"},
+			{title: "Big Buck Bunny", url:"http://ftp.akl.lt/Video/Big_Buck_Bunny/big_buck_bunny_480p_h264.mov"},
+			{title: "Sintel", url:"http://ftp.akl.lt/Video/Sintel/sintel-2048-surround.mp4"},
+			{title: "Elephants Dream", url:"http://ftp.akl.lt/Video/Elephants_Dream/Elephants_Dream_1024-h264-st-aac.mov"},
+			{title: "Codebreakers", url:"http://ftp.akl.lt/Video/Codebreakers/codebreakers.m4v"}
 		]);
 		
 		
@@ -172,9 +174,7 @@ App.FragmentItemView = Backbone.View.extend({
 	        channel: "vtm",
 	        message: {
 				"user": $("#username").val(),
-				"movie": this.model.get("url"),
-				"startframe": 0,
-				"stopframe": 99999
+				"movie": this.model.get("url")
 	        }
 		});
 		
@@ -202,7 +202,7 @@ App.ShareView = App.MainView.extend({
 				}
 		);
 		*/
-		console.log("sharing '" + App.router.currentFragment.get("title") + "' with comment: '" + this.$("textarea").val());
+		console.log("sharing '" + App.router.currentFragment.get("title") + "' with comment: '" + this.$("textarea").val() + " (username:" + $("#username").val() + ")");
 	}
 });
 
