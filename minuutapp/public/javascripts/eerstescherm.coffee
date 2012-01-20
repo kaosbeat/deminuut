@@ -5,7 +5,7 @@ $(document).ready ->
 		connect: ->console.log("connected")
 		callback: (message)->
 			console.log(message)
-			if(message.user == "matthias") 
+			if(message.user == $("#user").val()) 
 				thevideo=new Video(message.movie ,  message.startframe, message.stopframe)
 				thevideo.play()
 

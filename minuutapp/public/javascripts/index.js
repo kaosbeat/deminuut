@@ -23,9 +23,9 @@ window.App = {
 		
 		//Add some fragments to the fragmentList (komt normaal van server):
 		App.fragments.add([
-		    {id:"benidorm", title: "Benidorm Bastards"},
-			{id:"watals", title: "Wat als?"},
-			{id:"akb", title: "Alles kan beter"}
+		    {id:"benidorm", title: "Benidorm Bastards", url:"http://champ.vrtmedialab.be/videos/benidormb.m4v"},
+			{id:"bigbuck", title: "Big Buck Bunny", url:"http://ftp.akl.lt/Video/Big_Buck_Bunny/big_buck_bunny_480p_h264.mov"},
+			{id:"demo", title: "Demo", url:"http://media.w3.org/2010/05/sintel/trailer.mp4"}
 		]);
 		
 		
@@ -166,7 +166,18 @@ App.FragmentItemView = Backbone.View.extend({
 	
 	this_click: function(event){
 		App.router.currentFragment = this.model;
-		console.log("will show '" + this.model.id + "' on first screen");
+		console.log("will show '" + this.model.get("url") + "' on first screen (username:" + $("#username").val() + ")");
+		
+		PUBNUB.publish({
+	        channel: "vtm",
+	        message: {
+				"user": $("#username").val(),
+				"movie": this.model.get("url"),
+				"startframe": 0,
+				"stopframe": 99999
+	        }
+		});
+		
 		App.router.navigate("share/", true);
 	}
 });
@@ -251,7 +262,8 @@ App.SharedItemView = Backbone.View.extend({
  */
 App.Fragment = Backbone.Model.extend({
 	defaults: {
-		title: "no-title"
+		title: "no-title",
+		url: "no-url"
 	}
 });
 
