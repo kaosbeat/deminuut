@@ -178,7 +178,7 @@ App.FragmentItemView = Backbone.View.extend({
 	        }
 		});
 		
-		App.router.navigate("share/", true);
+		//App.router.navigate("share/", true);
 	}
 });
 
