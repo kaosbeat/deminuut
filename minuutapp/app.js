@@ -19,6 +19,25 @@ var network = pubnub.init({
     ssl           : false,
     origin        : "pubsub.pubnub.com"
 });
+
+
+//sockjs alternatief
+/*var sockjs = require('sockjs');
+
+var sockjs_opts = {sockjs_url: "http://cdn.sockjs.org/sockjs-0.2.min.js"};
+var broadcast={}
+var echo = sockjs.createServer(sockjs_opts);
+echo.on('connection', function(conn) {
+    broadcast[conn.id]=conn; //connecties bij houden
+    conn.on('data', function(message) {
+        conn.write(message);
+        console.log(message)
+        for(var id in broadcast){
+          broadcast[id].write("got the stupid message")
+        }
+    });
+    conn.on('close', function() {});
+});*/
 		
 var app = module.exports = express.createServer();
 
@@ -58,6 +77,14 @@ app.get('/eerstescherm', function(req, res){
   });
 });
 
+app.get('/pubnubtest', function(req, res){
+  res.render('pubnubtest', {
+    script: 'pubnubtest'
+  });
+});
+
+//indien sockjs
+//echo.installHandlers(app, {prefix:'[/]echo'});
 
 // Only listen on $ node app.js
 
@@ -69,7 +96,7 @@ if (!module.parent) {
 
 //listen for remote button post
 //
-
+//en post naar pubnub
 app.post('/', function(req, res){
     console.log(req.body.user);
 		console.log(req.body.video);
