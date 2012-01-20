@@ -47,7 +47,7 @@ app.configure('production', function(){
 
 app.get('/', function(req, res){
   res.render('index', {
-    script: 'remote'
+    script: 'index'
   });
 });
 
