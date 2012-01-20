@@ -52,10 +52,10 @@ header{
 }
 
 header>#username{
-	width: 100px;
+	width: 65px;
 	position: absolute;
-	top: 4px;
-	right: 4px;	
+	top: 1px;
+	left: 4px;	
 }
 
 .mainview{
