@@ -47,9 +47,7 @@ window.App = {
 /**
  * App.Router: zorgt voor de routes tussen de (voorlopig) 3 mainviews.
  */
-App.Router = Backbone.Router.extend({
-	currentFragment: null,
-	
+App.Router = Backbone.Router.extend({	
 	routes: {
 		'': 'defaultRoute',
 		'remotecontrol/' : 'showRemoteControlView',
@@ -167,7 +165,6 @@ App.FragmentItemView = Backbone.View.extend({
 	},
 	
 	this_click: function(event){
-		App.router.currentFragment = this.model;
 		console.log("will show '" + this.model.get("url") + "' on first screen (username:" + $("#username").val() + ")");
 		
 		PUBNUB.publish({
@@ -177,6 +174,8 @@ App.FragmentItemView = Backbone.View.extend({
 				"movie": this.model.get("url")
 	        }
 		});
+		
+		App.shareView.updateCurrentlyPlaying(this.model);
 		
 		//App.router.navigate("share/", true);
 	}
@@ -192,16 +191,21 @@ App.ShareView = App.MainView.extend({
 		'click button': 'sharebutton_clickHandler'
 	},
 	
+	updateCurrentlyPlaying: function(fragment){
+		this.model = fragment;
+		this.$("#currentlyplaying").html(fragment.get("title"));
+	},
+	
 	sharebutton_clickHandler: function(event){
-		/*
-		$.post("/", {
+		$.post("/posts/share", {
+				movieurl: this.model.get("url"),
+				username: $("#username").val(),
 				comment: this.$("textarea").val()
 			},
-				function(data) {
-					console.dir(data);
-				}
+			function(data) {
+				console.dir(data);
+			}
 		);
-		*/
 		console.log("sharing '" + App.router.currentFragment.get("title") + "' with comment: '" + this.$("textarea").val() + " (username:" + $("#username").val() + ")");
 	}
 });

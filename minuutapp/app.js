@@ -93,7 +93,44 @@ if (!module.parent) {
   console.log("Express server listening on port %d", app.address().port);
 }
 
+var playingOnFirstScreen = {};
 
+app.post('/posts/playingonfirstscreen', function(request, response) {
+	var now = new Date();
+	playingOnFirstScreen[request.body.username] = {
+			movieurl: request.body.movieurl,
+			startdate: now
+	}
+    console.log("[" + now + "] " + request.body.username + " is playing " + request.body.movieurl + " on the first screen.");
+    
+    response.writeHead(200, {"Content-Type": "text/plain"});
+    response.write("ok");
+    response.end();
+});
+
+
+app.post('/posts/share', function(request, response) {
+	var playObject = playingOnFirstScreen[request.body.username];
+	if(playObject != null && playObject.movieurl == request.body.movieurl){
+		var now = new Date();
+		var playtimeInMilliseconds = now.getTime() - playObject.startdate.getTime();
+		var beginTimeInMilliseconds = playtimeInMilliseconds - 1000*20; //20 seconden aftrekken
+		
+		var endFrame = 25/1000 * playtimeInMilliseconds;
+		var beginFrame =  25/1000 * beginTimeInMilliseconds;
+		console.log("sharing " + playObject.movieurl + " at " + endFrame + "frames, with comment: " + request.body.comment)
+	}
+	
+    response.writeHead(200, {"Content-Type": "text/plain"});
+    response.write("ok");
+    response.end();
+
+});
+
+
+
+
+/*
 //listen for remote button post
 //
 //en post naar pubnub
@@ -112,6 +149,10 @@ app.post('/', function(req, res){
     });
 		
 });
+
+*/
+
+
 
 
 
