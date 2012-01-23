@@ -206,7 +206,7 @@ App.ShareView = App.MainView.extend({
 				console.dir(data);
 			}
 		);
-		console.log("sharing '" + App.router.currentFragment.get("title") + "' with comment: '" + this.$("textarea").val() + " (username:" + $("#username").val() + ")");
+		console.log("sharing '" + this.model.get("title") + "' with comment: '" + this.$("textarea").val() + " (username:" + $("#username").val() + ")");
 	}
 });
 
