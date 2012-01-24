@@ -1,4 +1,4 @@
-﻿//================ ENTRY POINT ==================
+//================ ENTRY POINT ==================
 
 $(function(event){
 	App.start();
@@ -23,7 +23,7 @@ window.App = {
 		
 		//Add some fragments to the fragmentList (kan van de server komen, maar zit hier nu statisch n):
 		App.fragments.add([
-		    {title: "Benidorm Bastards", url:"http://champ.vrtmedialab.be/videos/benidormb.m4v"},
+		    {title: "Benidorm Bastards", url:"http://www.neat.be/down/benidorm.bastards.2x07.m4v"},
 			{title: "Big Buck Bunny", url:"http://ftp.akl.lt/Video/Big_Buck_Bunny/big_buck_bunny_480p_h264.mov"},
 			{title: "Sintel", url:"http://ftp.akl.lt/Video/Sintel/sintel-2048-surround.mp4"},
 			{title: "Elephants Dream", url:"http://ftp.akl.lt/Video/Elephants_Dream/Elephants_Dream_1024-h264-st-aac.mov"},
@@ -39,6 +39,9 @@ window.App = {
 		]);
 		*/
 		
+		//bestaande SharedItems van de server halen:
+		App.sharedItems.fetch();
+		
 		//Start monitoring url hashes:
 		Backbone.history.start();
 		
@@ -53,7 +56,7 @@ window.App = {
 	        		title: message.title,
 	        		user: message.user,
 	        		comment: message.comment,
-	        		url: message.movie,
+	        		url: message.url,
 	        		starttime: message.starttime,
 	        		endtime: message.endtime
 	        	});
@@ -222,7 +225,7 @@ App.ShareView = App.MainView.extend({
 	sharebutton_clickHandler: function(event){
 		$.post("/posts/share", {
 				title: this.model.get("title"),
-				movieurl: this.model.get("url"),
+				url: this.model.get("url"),
 				username: $("#username").val(),
 				comment: this.$("textarea").val()
 			},
@@ -243,9 +246,9 @@ App.SharedItemsView = App.MainView.extend({
 	
 	showVideo: function(sharedItem){
 		this.$("#myvideo").show();
+		console.log("showing shared item: " + sharedItem.get("url") + " from " +  sharedItem.get("starttime") + " to " + sharedItem.get("endtime") + " ms");
 		var thevideo = new Video(sharedItem.get("url"), sharedItem.get("starttime"), sharedItem.get("endtime"));
 		thevideo.play();
-		
 	},
 	
 	initialize: function(){
@@ -288,7 +291,7 @@ App.SharedItemView = Backbone.View.extend({
 	},
 	
 	this_clickHandler: function(event){
-		console.log("will show shared item: "  + this.model.get("title"));
+		console.log("will show shared item: "  + this.model.get("url"));
 		App.sharedItemsView.showVideo(this.model);
 	}
 });
@@ -333,5 +336,6 @@ App.FragmentList = Backbone.Collection.extend({
  * Dus fragmenten die de gebruiker gedeeld heeft.
  */
 App.SharedItemList = Backbone.Collection.extend({
-	model: App.SharedItem
+	model: App.SharedItem,
+	url: '/getshareditems'
 });

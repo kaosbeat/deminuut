@@ -1,5 +1,24 @@
 
 /**
+ * Variablen in het geheugen.
+ * Zou eigenlijk in een DB moeten staan voor persistentie
+ */
+var playingOnFirstScreen = {}; //houdt bij wie er wat op het eerste scherm aant spelen is
+var shareditems = new Array(); //houdt de gedeelde items bij.
+
+var benidormBasterdsShotlist = new Array();
+benidormBasterdsShotlist.push({start:0, end:33920});
+benidormBasterdsShotlist.push({start:33960, end:54160});
+benidormBasterdsShotlist.push({start:54200, end:69480});
+benidormBasterdsShotlist.push({start:69520, end:95880});
+benidormBasterdsShotlist.push({start:95920, end:120520});
+benidormBasterdsShotlist.push({start:120560, end:150120});
+benidormBasterdsShotlist.push({start:150160, end:187240});
+benidormBasterdsShotlist.push({start:187280, end:205960});
+benidormBasterdsShotlist.push({start:206000, end:234280});
+benidormBasterdsShotlist.push({start:234320, end:285160});
+
+/**
  * Module dependencies.
  */
 
@@ -99,13 +118,12 @@ if (!module.parent) {
   console.log("Express server listening on port %d", app.address().port);
 }
 
-//variable in geheugen (ipv naar redis te sturen, kasper moet dit maar implemeteren :p)
-var playingOnFirstScreen = {};
+
 
 app.post('/posts/playingonfirstscreen', function(request, response) {
 	var now = new Date();
 	playingOnFirstScreen[request.body.username] = {
-			movieurl: request.body.movieurl,
+			url: request.body.movieurl,
 			startdate: now
 	}
     console.log("[" + now + "] " + request.body.username + " is playing " + request.body.movieurl + " on the first screen.");
@@ -118,22 +136,43 @@ app.post('/posts/playingonfirstscreen', function(request, response) {
 
 app.post('/posts/share', function(request, response) {
 	var playObject = playingOnFirstScreen[request.body.username];
-	if(playObject != null && playObject.movieurl == request.body.movieurl){
+	if(playObject != null && playObject.url == request.body.url){
 		var now = new Date();
-		var playtimeInMilliseconds = now.getTime() - playObject.startdate.getTime();
-		var beginTimeInMilliseconds = playtimeInMilliseconds - 1000*10; //20 seconden aftrekken
-		if(beginTimeInMilliseconds < 0)
-			beginTimeInMilliseconds = 0; 
-		console.log(request.body.username + " shares " + playObject.movieurl + " from " +beginTimeInMilliseconds + " to " + playtimeInMilliseconds + " milliseconds, with comment: " + request.body.comment)
+		var endTime = now.getTime() - playObject.startdate.getTime();
+		var startTime = 0;
+		
+		//checken of het een benidorm basterds shotje is:
+		var benidormShot = checkBenidormBastardsShotlist(endTime, request.body.url);
+		if(benidormShot !== false){
+			startTime = benidormShot.start;
+			endTime = benidormShot.end;
+		}else{
+			startTime = endTime - 1000*10; //20 seconden aftrekken
+			if(startTime < 0)
+				startTime = 0;
+		}
+
+		console.log(request.body.username + " shares " + playObject.movieurl + " from " + startTime + " to " + endTime + " milliseconds, with comment: " + request.body.comment)
 	
+		//toevoegen aan lokale shareditems (zodat nieuwe clients die kunnen opvragen):
+		shareditems.push({
+			user: request.body.username,
+			title: request.body.title,
+			url: request.body.url,
+			starttime: startTime,
+			endtime: endTime,
+			comment: request.body.comment
+		});
+		
+		//doorsturen naar geconnecteerde client via pubnub:
 		pubnubNetwork.publish({
 	        channel: "newshareditems",
 	        message: {
 				user: request.body.username,
 				title: request.body.title,
-				movie: playObject.movieurl,
-				starttime: beginTimeInMilliseconds,
-				endtime: playtimeInMilliseconds,
+				url: request.body.url,
+				starttime: startTime,
+				endtime: endTime,
 				comment: request.body.comment
 	        }
 		});
@@ -143,6 +182,26 @@ app.post('/posts/share', function(request, response) {
     response.write("ok");
     response.end();
 
+});
+
+function checkBenidormBastardsShotlist(time, moviename){
+	if(moviename.indexOf("benidorm") == -1)
+		return false;
+	
+	for(var i=0; i<benidormBasterdsShotlist.length; i++){
+		var shot = benidormBasterdsShotlist[i];
+		if(shot.start < time && time < shot.end){
+			return shot;
+		}
+	}
+	
+	return false;
+}
+
+app.get('/getshareditems', function(request, response) {
+    response.writeHead(200, {'content-type': 'text/json' });
+    response.write( JSON.stringify(shareditems) );
+    response.end('\n');
 });
 
 
