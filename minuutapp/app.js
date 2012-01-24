@@ -123,10 +123,10 @@ if (!module.parent) {
 app.post('/posts/playingonfirstscreen', function(request, response) {
 	var now = new Date();
 	playingOnFirstScreen[request.body.username] = {
-			url: request.body.movieurl,
+			url: request.body.url,
 			startdate: now
 	}
-    console.log("[" + now + "] " + request.body.username + " is playing " + request.body.movieurl + " on the first screen.");
+    console.log("[" + now + "] " + request.body.username + " is playing " + request.body.url + " on the first screen.");
     
     response.writeHead(200, {"Content-Type": "text/plain"});
     response.write("ok");
@@ -201,6 +201,17 @@ function checkBenidormBastardsShotlist(time, moviename){
 app.get('/getshareditems', function(request, response) {
     response.writeHead(200, {'content-type': 'text/json' });
     response.write( JSON.stringify(shareditems) );
+    response.end('\n');
+});
+
+app.get('/getwhatsplayingonfirstscreen', function(request, response) {
+	var playObject = playingOnFirstScreen[request.query.username];
+	
+    response.writeHead(200, {'content-type': 'text/json' });
+    if(playObject != null)
+    	response.write( JSON.stringify(playObject) );
+    else
+    	response.write( JSON.stringify("nothings-playing") );
     response.end('\n');
 });
 

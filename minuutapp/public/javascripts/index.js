@@ -5,6 +5,27 @@ $(function(event){
 });
 
 window.App = {
+	 checkFirstScreen: function(){
+		//check of er iets aant spelen is op het eerste scherm van mij:
+		$.getJSON( "/getwhatsplayingonfirstscreen",
+				{
+					username: $("#username").val()
+				},
+				function(data, textStatus, jqXHR){
+					if(data != "nothings-playing"){	
+						var currentFragment = App.fragments.find(function(model){
+							return model.get("url") == data.url;
+						});
+						console.log("you are currently playing: "  + currentFragment.get("title"));
+						
+						//updating de shareview:
+						App.shareView.updateCurrentlyPlaying(currentFragment);
+					}else{
+						App.shareView.updateCurrentlyPlaying(null);
+					}
+				});
+	},
+		
 	start: function(){
 		App.router = new App.Router();
 		App.navigationView = new App.NavigationView();
@@ -41,6 +62,14 @@ window.App = {
 		
 		//bestaande SharedItems van de server halen:
 		App.sharedItems.fetch();
+		
+		//check of er iets aant spelen is op het eerste scherm van mij:
+		App.checkFirstScreen();
+		
+		//check voor verandering in username:
+		$("#username").change(function(event){
+			App.checkFirstScreen();
+		});
 		
 		//Start monitoring url hashes:
 		Backbone.history.start();
@@ -194,10 +223,11 @@ App.FragmentItemView = Backbone.View.extend({
 		console.log("will show '" + this.model.get("url") + "' on first screen (username:" + $("#username").val() + ")");
 		
 		PUBNUB.publish({
-	        channel: "vtm",
+	        channel: "playingonfirstscreen",
 	        message: {
-				"user": $("#username").val(),
-				"movie": this.model.get("url")
+				username: $("#username").val(),
+				title: this.model.get("title"),
+				url: this.model.get("url")
 	        }
 		});
 		
@@ -219,21 +249,29 @@ App.ShareView = App.MainView.extend({
 	
 	updateCurrentlyPlaying: function(fragment){
 		this.model = fragment;
-		this.$("#currentlyplaying").html(fragment.get("title"));
+		if(this.model != null)
+			this.$("#currentlyplaying").html(fragment.get("title"));
+		else
+			this.$("#currentlyplaying").html("");
 	},
 	
 	sharebutton_clickHandler: function(event){
-		$.post("/posts/share", {
-				title: this.model.get("title"),
-				url: this.model.get("url"),
-				username: $("#username").val(),
-				comment: this.$("textarea").val()
-			},
-			function(data) {
-				console.dir(data);
-			}
-		);
-		console.log("sharing '" + this.model.get("title") + "' with comment: '" + this.$("textarea").val() + " (username:" + $("#username").val() + ")");
+		if(this.model != null){
+			$.post("/posts/share", {
+					title: this.model.get("title"),
+					url: this.model.get("url"),
+					username: $("#username").val(),
+					comment: this.$("textarea").val()
+				},
+				function(data) {
+					console.dir(data);
+					App.router.navigate("shareditems/", true); //doorgaan naar shared items
+				}
+			);
+			console.log("sharing '" + this.model.get("title") + "' with comment: '" + this.$("textarea").val() + " (username:" + $("#username").val() + ")");
+		}else{
+			alert("Er speelt niets op je eerste scherm!");
+		}
 	}
 });
 
