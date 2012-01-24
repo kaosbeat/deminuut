@@ -3,8 +3,8 @@
  * Variablen in het geheugen.
  * Zou eigenlijk in een DB moeten staan voor persistentie
  */
-var playingOnFirstScreen = {};
-var shareditems = new Array();
+var playingOnFirstScreen = {}; //houdt bij wie er wat op het eerste scherm aant spelen is
+var shareditems = new Array(); //houdt de gedeelde items bij.
 
 /**
  * Module dependencies.

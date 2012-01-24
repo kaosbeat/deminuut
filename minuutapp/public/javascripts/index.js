@@ -39,7 +39,8 @@ window.App = {
 		]);
 		*/
 		
-		App.sharedItems.fetch(); //eventueel van de server halen mochten er zijn.
+		//bestaande SharedItems van de server halen:
+		App.sharedItems.fetch();
 		
 		//Start monitoring url hashes:
 		Backbone.history.start();
