@@ -87,6 +87,10 @@ header>#username{
 	color: #F7F7F4;
 }
 
+#mainview-share>#playsnow{
+	font-size: 14px;	
+}
+
 #mainview-shareditems>ul>li{
 }
 
@@ -123,6 +127,6 @@ nav>.item{
 	background-color: #444444;
 }
 
-#eerstescherm>#username{
+#eerstescherm>span{
 	font-size: 16px;	
 }

@@ -23,9 +23,11 @@ window.App = {
 		
 		//Add some fragments to the fragmentList (komt normaal van server):
 		App.fragments.add([
-		    {id:"benidorm", title: "Benidorm Bastards", url:"http://champ.vrtmedialab.be/videos/benidormb.m4v"},
-			{id:"bigbuck", title: "Big Buck Bunny", url:"http://ftp.akl.lt/Video/Big_Buck_Bunny/big_buck_bunny_480p_h264.mov"},
-			{id:"demo", title: "Demo", url:"http://media.w3.org/2010/05/sintel/trailer.mp4"}
+		    {title: "Benidorm Bastards", url:"http://champ.vrtmedialab.be/videos/benidormb.m4v"},
+			{title: "Big Buck Bunny", url:"http://ftp.akl.lt/Video/Big_Buck_Bunny/big_buck_bunny_480p_h264.mov"},
+			{title: "Sintel", url:"http://ftp.akl.lt/Video/Sintel/sintel-2048-surround.mp4"},
+			{title: "Elephants Dream", url:"http://ftp.akl.lt/Video/Elephants_Dream/Elephants_Dream_1024-h264-st-aac.mov"},
+			{title: "Codebreakers", url:"http://ftp.akl.lt/Video/Codebreakers/codebreakers.m4v"}
 		]);
 		
 		
@@ -45,9 +47,7 @@ window.App = {
 /**
  * App.Router: zorgt voor de routes tussen de (voorlopig) 3 mainviews.
  */
-App.Router = Backbone.Router.extend({
-	currentFragment: null,
-	
+App.Router = Backbone.Router.extend({	
 	routes: {
 		'': 'defaultRoute',
 		'remotecontrol/' : 'showRemoteControlView',
@@ -165,18 +165,17 @@ App.FragmentItemView = Backbone.View.extend({
 	},
 	
 	this_click: function(event){
-		App.router.currentFragment = this.model;
 		console.log("will show '" + this.model.get("url") + "' on first screen (username:" + $("#username").val() + ")");
 		
 		PUBNUB.publish({
 	        channel: "vtm",
 	        message: {
 				"user": $("#username").val(),
-				"movie": this.model.get("url"),
-				"startframe": 0,
-				"stopframe": 99999
+				"movie": this.model.get("url")
 	        }
 		});
+		
+		App.shareView.updateCurrentlyPlaying(this.model);
 		
 		//App.router.navigate("share/", true);
 	}
@@ -192,17 +191,22 @@ App.ShareView = App.MainView.extend({
 		'click button': 'sharebutton_clickHandler'
 	},
 	
+	updateCurrentlyPlaying: function(fragment){
+		this.model = fragment;
+		this.$("#currentlyplaying").html(fragment.get("title"));
+	},
+	
 	sharebutton_clickHandler: function(event){
-		/*
-		$.post("/", {
+		$.post("/posts/share", {
+				movieurl: this.model.get("url"),
+				username: $("#username").val(),
 				comment: this.$("textarea").val()
 			},
-				function(data) {
-					console.dir(data);
-				}
+			function(data) {
+				console.dir(data);
+			}
 		);
-		*/
-		console.log("sharing '" + App.router.currentFragment.get("title") + "' with comment: '" + this.$("textarea").val());
+		console.log("sharing '" + this.model.get("title") + "' with comment: '" + this.$("textarea").val() + " (username:" + $("#username").val() + ")");
 	}
 });
 
