@@ -4,3 +4,6 @@ minuutapp/public/javascripts/eerstescherm.js
 minuutapp/public/benidorm.bastards.jg02afl07.hdtv.720p.x264-kol0nel.m4v
 minuutapp/public/javascripts/video.js
 minuutapp/public/javascripts/pubnubtest.js
+minuutapp/public/javascripts/vidtest.coffee
+minuutapp/public/javascripts/vidtest.js
+minuutapp/views/vidtest.jade
