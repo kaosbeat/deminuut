@@ -152,7 +152,7 @@ app.post('/posts/share', function(request, response) {
 				startTime = 0;
 		}
 
-		console.log(request.body.username + " shares " + playObject.movieurl + " from " + startTime + " to " + endTime + " milliseconds, with comment: " + request.body.comment)
+		console.log(request.body.username + " shares " + request.body.url + " from " + startTime + " to " + endTime + " milliseconds, with comment: " + request.body.comment)
 	
 		//toevoegen aan lokale shareditems (zodat nieuwe clients die kunnen opvragen):
 		shareditems.push({
