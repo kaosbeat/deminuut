@@ -243,8 +243,9 @@ App.SharedItemsView = App.MainView.extend({
 	
 	showVideo: function(sharedItem){
 		this.$("#myvideo").show();
-		var thevideo = new Video(sharedItem.get("url"), sharedItem.get("startime"), sharedItem.get("endtime"));
+		var thevideo = new Video(sharedItem.get("url"), sharedItem.get("starttime"), sharedItem.get("endtime"));
 		thevideo.play();
+		
 	},
 	
 	initialize: function(){
