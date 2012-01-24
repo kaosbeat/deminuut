@@ -3,9 +3,10 @@
 script(id="shareditem-template", type="text/x-jquery-tmpl")
 	.title ${title}
 	.user ${user}
-	.comment ${comment}
-	.timespan
-		${starttime} to ${endtime}
+	.commentandtimespan
+		.comment ${comment}
+		.timespan
+			${starttime} to ${endtime}
 
 header De Minuut
 	input#username(type="input", value="matthias")

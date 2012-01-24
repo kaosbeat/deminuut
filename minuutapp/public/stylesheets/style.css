@@ -96,6 +96,7 @@ header>#username{
 }
 
 #mainview-shareditems>ul>li{
+	height: 30px;
 }
 
 #mainview-shareditems>ul>li>.title{
@@ -109,15 +110,18 @@ header>#username{
 	color: #898989;
 }
 
-#mainview-shareditems>ul>li>.timespan{
-	float: right;
-	color: #898989;
-	margin-top: -15px;
+#mainview-shareditems>ul>li>.commentandtimespan{
+	clear: both;
+	padding-top: 5px;
 }
 
-#mainview-shareditems>ul>li>.comment{
-	padding-top: 5px;
-	clear: both;
+#mainview-shareditems>ul>li>.commentandtimespan>.comment{
+	float: left;
+	color: #898989;
+}
+
+#mainview-shareditems>ul>li>.commentandtimespan>.timespan{
+	float: right;
 	color: #898989;
 }
 
