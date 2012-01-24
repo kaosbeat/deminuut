@@ -21,7 +21,7 @@ window.App = {
 		App.sharedItemsView = new App.SharedItemsView();
 		
 		
-		//Add some fragments to the fragmentList (komt normaal van server):
+		//Add some fragments to the fragmentList (kan van de server komen, maar zit hier nu statisch n):
 		App.fragments.add([
 		    {title: "Benidorm Bastards", url:"http://champ.vrtmedialab.be/videos/benidormb.m4v"},
 			{title: "Big Buck Bunny", url:"http://ftp.akl.lt/Video/Big_Buck_Bunny/big_buck_bunny_480p_h264.mov"},
@@ -30,15 +30,38 @@ window.App = {
 			{title: "Codebreakers", url:"http://ftp.akl.lt/Video/Codebreakers/codebreakers.m4v"}
 		]);
 		
-		
-		//Add some shared items to the shared items list (komt normaal van server):
+		/*
+		//Test items:
 		App.sharedItems.add([	
-			{id:0, title: "Benidorm Bastards", user:"Sam", comment:"Vet cool"},
-			{id:1, title: "Wat als?", user:"Matthias", comment:"Should've seen this!"}
+			{title: "Big Buck Bunny", user:"Sam", comment:"Vet cool", url:"http://ftp.akl.lt/Video/Big_Buck_Bunny/big_buck_bunny_480p_h264.mov", starttime:0, endtime:80},
+			{title: "Sintel", user:"Matthias", comment:"Should've seen this!", url:"http://ftp.akl.lt/Video/Sintel/sintel-2048-surround.mp4", startime:0, endtime:200},
+			{title: "Sam", user:"Matthias", comment:"Should've seen this!", url:"http://10.10.129.186:8888", startime:0, endtime:0}	
 		]);
+		*/
 		
 		//Start monitoring url hashes:
-		Backbone.history.start();		
+		Backbone.history.start();
+		
+		//start listening for new shared items:
+	    PUBNUB.subscribe({
+	        channel  : "newshareditems",      // CONNECT TO THIS CHANNEL.
+	        error    : function() {        // LOST CONNECTION (auto reconnects)
+	            alert("Connection Lost. Will auto-reconnect when Online.")
+	        },
+	        callback : function(message) { // RECEIVED A MESSAGE.
+	        	var newSharedItem = new App.SharedItem({
+	        		title: message.title,
+	        		user: message.user,
+	        		comment: message.comment,
+	        		url: message.movie,
+	        		starttime: message.starttime,
+	        		endtime: message.endtime
+	        	});
+	        	
+	        	//toevoegen aan collection:
+	        	App.sharedItems.add(newSharedItem);
+	        }
+	    })
 	}
 };
 
@@ -198,6 +221,7 @@ App.ShareView = App.MainView.extend({
 	
 	sharebutton_clickHandler: function(event){
 		$.post("/posts/share", {
+				title: this.model.get("title"),
 				movieurl: this.model.get("url"),
 				username: $("#username").val(),
 				comment: this.$("textarea").val()
@@ -217,9 +241,17 @@ App.ShareView = App.MainView.extend({
 App.SharedItemsView = App.MainView.extend({
 	el: "#mainview-shareditems",
 	
+	showVideo: function(sharedItem){
+		this.$("#myvideo").show();
+		var thevideo = new Video(sharedItem.get("url"), sharedItem.get("startime"), sharedItem.get("endtime"));
+		thevideo.play();
+	},
+	
 	initialize: function(){
 		App.sharedItems.bind("add", this.renderItem, this);
 		App.sharedItems.bind("reset", this.renderAll, this);
+		
+		this.$("#myvideo").hide();
 	},
 	
 	renderItem: function(model){
@@ -256,6 +288,7 @@ App.SharedItemView = Backbone.View.extend({
 	
 	this_clickHandler: function(event){
 		console.log("will show shared item: "  + this.model.get("title"));
+		App.sharedItemsView.showVideo(this.model);
 	}
 });
 
@@ -278,7 +311,10 @@ App.SharedItem = Backbone.Model.extend({
 	defaults:{
 		title: "no-title",
 		user: "some-user",
-		comment: "default-comment"
+		comment: "default-comment",
+		url: "no-url",
+		starttime: "no-starttime",
+		endtime: "no-endtime"
 	}
 });
 

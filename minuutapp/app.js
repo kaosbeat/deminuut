@@ -12,7 +12,7 @@ client.on("error", function (err) {
 
 
 var pubnub  = require("pubnub");
-var network = pubnub.init({
+var pubnubNetwork = pubnub.init({
     publish_key   : "pub-7b2681ab-27d3-47dc-8278-15aa1d8bfb57",
     subscribe_key : "sub-6bee67b8-41be-11e1-99f4-754603d9dc6f",
     secret_key    : "",
@@ -93,6 +93,7 @@ if (!module.parent) {
   console.log("Express server listening on port %d", app.address().port);
 }
 
+//variable in geheugen (ipv naar redis te sturen, kasper moet dit maar implemeteren :p)
 var playingOnFirstScreen = {};
 
 app.post('/posts/playingonfirstscreen', function(request, response) {
@@ -114,11 +115,22 @@ app.post('/posts/share', function(request, response) {
 	if(playObject != null && playObject.movieurl == request.body.movieurl){
 		var now = new Date();
 		var playtimeInMilliseconds = now.getTime() - playObject.startdate.getTime();
-		var beginTimeInMilliseconds = playtimeInMilliseconds - 1000*20; //20 seconden aftrekken
-		
-		var endFrame = 25/1000 * playtimeInMilliseconds;
-		var beginFrame =  25/1000 * beginTimeInMilliseconds;
-		console.log("sharing " + playObject.movieurl + " at " + endFrame + "frames, with comment: " + request.body.comment)
+		var beginTimeInMilliseconds = playtimeInMilliseconds - 1000*10; //20 seconden aftrekken
+		if(beginTimeInMilliseconds < 0)
+			beginTimeInMilliseconds = 0; 
+		console.log(request.body.username + " shares " + playObject.movieurl + " from " +beginTimeInMilliseconds + " to " + playtimeInMilliseconds + " milliseconds, with comment: " + request.body.comment)
+	
+		pubnubNetwork.publish({
+	        channel: "newshareditems",
+	        message: {
+				user: request.body.username,
+				title: request.body.title,
+				movie: playObject.movieurl,
+				starttime: beginTimeInMilliseconds,
+				endtime: playtimeInMilliseconds,
+				comment: request.body.comment
+	        }
+		});
 	}
 	
     response.writeHead(200, {"Content-Type": "text/plain"});

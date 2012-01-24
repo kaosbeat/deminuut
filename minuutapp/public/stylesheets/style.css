@@ -91,6 +91,10 @@ header>#username{
 	font-size: 14px;	
 }
 
+#mainview-shareditems>video{
+	background-color: #000;	
+}
+
 #mainview-shareditems>ul>li{
 }
 
@@ -103,6 +107,12 @@ header>#username{
 	float: right;
 	font-weight: bold;
 	color: #898989;
+}
+
+#mainview-shareditems>ul>li>.timespan{
+	float: right;
+	color: #898989;
+	margin-top: -15px;
 }
 
 #mainview-shareditems>ul>li>.comment{

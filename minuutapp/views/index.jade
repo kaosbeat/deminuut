@@ -4,6 +4,8 @@ script(id="shareditem-template", type="text/x-jquery-tmpl")
 	.title ${title}
 	.user ${user}
 	.comment ${comment}
+	.timespan
+		${starttime} to ${endtime}
 
 header De Minuut
 	input#username(type="input", value="matthias")
@@ -18,6 +20,7 @@ header De Minuut
 	br
 	button Deel deze minuut
 .mainview#mainview-shareditems
+	video#myvideo(width="100%", height="200px", controls="controls")
 	ul
 nav
 	.item#remotecontrol afstands-bediening
