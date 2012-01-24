@@ -14,9 +14,9 @@ class @Video
 		begintime=starttime
 		endtime=stoptime
 		#zonder klik lukt de echte fullscreen niet
-		jvideo.click( ->
+		jvideo.click ->
 			if(nativedom.webkitSupportsFullscreen)
-				nativedom.webkitEnterFullScreen())
+				nativedom.webkitEnterFullScreen()
 		#*: testje over hoe andere member functions oproepen
 		_this=this
 		initialize= ->
