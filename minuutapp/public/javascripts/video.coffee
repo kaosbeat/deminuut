@@ -9,6 +9,7 @@ class @Video
 		#jvideo.hide(); moet werken op ipad!!
 		nativedom=$('video').first().get(0)
 		jvideo.attr('src', video)
+		nativedom.load()
 		
 
 		begintime=starttime
@@ -97,6 +98,8 @@ class @Video
 				console.log('data loaded')
 
 		nativedom.addEventListener('loadeddata', enableplaying)	
+
+
 
 
 
