@@ -1,4 +1,4 @@
-﻿//================ ENTRY POINT ==================
+//================ ENTRY POINT ==================
 
 $(function(event){
 	App.start();
@@ -35,7 +35,7 @@ window.App = {
 		App.sharedItems.add([	
 			{title: "Big Buck Bunny", user:"Sam", comment:"Vet cool", url:"http://ftp.akl.lt/Video/Big_Buck_Bunny/big_buck_bunny_480p_h264.mov", starttime:0, endtime:80},
 			{title: "Sintel", user:"Matthias", comment:"Should've seen this!", url:"http://ftp.akl.lt/Video/Sintel/sintel-2048-surround.mp4", startime:0, endtime:200},
-			{title: "Sam", user:"Matthias", comment:"", url:"http://10.10.129.186:8888", startime:0, endtime:0}	
+			{title: "Sam", user:"Matthias", comment:"Should've seen this!", url:"http://10.10.129.186:8888", startime:0, endtime:0}	
 		]);
 		*/
 		
@@ -244,7 +244,7 @@ App.ShareView = App.MainView.extend({
 App.SharedItemsView = App.MainView.extend({
 	el: "#mainview-shareditems",
 	
-	showVideo: function(sharedItem){;
+	showVideo: function(sharedItem){
 		this.$("#myvideo").show();
 		console.log("showing shared item: " + sharedItem.get("url") + " from " +  sharedItem.get("starttime") + " to " + sharedItem.get("endtime") + " ms");
 		var thevideo = new Video(sharedItem.get("url"), sharedItem.get("starttime"), sharedItem.get("endtime"));

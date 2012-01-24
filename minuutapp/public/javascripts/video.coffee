@@ -6,19 +6,21 @@ class @Video
 	oriwidth=oriheight=0
 	constructor:	(@video, @starttime, @stoptime)->
 		jvideo=$('video').first()
-		jvideo.hide()
+		#jvideo.hide(); moet werken op ipad!!
 		nativedom=$('video').first().get(0)
 		jvideo.attr('src', video)
 		
 
 		begintime=starttime
 		endtime=stoptime
+		_this=this
 		#zonder klik lukt de echte fullscreen niet
 		jvideo.click ->
 			if(nativedom.webkitSupportsFullscreen)
 				nativedom.webkitEnterFullScreen()
+			
 		#*: testje over hoe andere member functions oproepen
-		_this=this
+		
 		initialize= ->
 			oriwidth=nativedom.videoWidth
 			oriheight=nativedom.videoHeight
@@ -96,6 +98,8 @@ class @Video
 
 		nativedom.addEventListener('loadeddata', enableplaying)	
 
+
+
 		reset= ->
 			_this.toOriginalSize()
 			nativedom.removeEventListener('loadedmetadata', initialize)
@@ -118,6 +122,7 @@ class @Video
 			if(readytoplay)
 				jvideo.show()
 				nativedom.play()
+				jvideo.removeAttr("controls") #voor de ipad heb je controls nodig om te beginnen, daarna verwijder je die
 			
 	onplay: (functie)->
 		nativedom.addEventListener('play',functie)			
