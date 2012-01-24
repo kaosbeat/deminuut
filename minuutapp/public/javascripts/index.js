@@ -39,6 +39,8 @@ window.App = {
 		]);
 		*/
 		
+		App.sharedItems.fetch(); //eventueel van de server halen mochten er zijn.
+		
 		//Start monitoring url hashes:
 		Backbone.history.start();
 		
@@ -332,5 +334,6 @@ App.FragmentList = Backbone.Collection.extend({
  * Dus fragmenten die de gebruiker gedeeld heeft.
  */
 App.SharedItemList = Backbone.Collection.extend({
-	model: App.SharedItem
+	model: App.SharedItem,
+	url: '/getshareditems'
 });

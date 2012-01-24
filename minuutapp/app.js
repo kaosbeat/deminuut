@@ -1,5 +1,12 @@
 
 /**
+ * Variablen in het geheugen.
+ * Zou eigenlijk in een DB moeten staan voor persistentie
+ */
+var playingOnFirstScreen = {};
+var shareditems = new Array();
+
+/**
  * Module dependencies.
  */
 
@@ -99,8 +106,7 @@ if (!module.parent) {
   console.log("Express server listening on port %d", app.address().port);
 }
 
-//variable in geheugen (ipv naar redis te sturen, kasper moet dit maar implemeteren :p)
-var playingOnFirstScreen = {};
+
 
 app.post('/posts/playingonfirstscreen', function(request, response) {
 	var now = new Date();
@@ -126,6 +132,17 @@ app.post('/posts/share', function(request, response) {
 			beginTimeInMilliseconds = 0; 
 		console.log(request.body.username + " shares " + playObject.movieurl + " from " +beginTimeInMilliseconds + " to " + playtimeInMilliseconds + " milliseconds, with comment: " + request.body.comment)
 	
+		//toevoegen aan lokale shareditems (zodat nieuwe clients die kunnen opvragen):
+		shareditems.push({
+			user: request.body.username,
+			title: request.body.title,
+			movie: playObject.movieurl,
+			starttime: beginTimeInMilliseconds,
+			endtime: playtimeInMilliseconds,
+			comment: request.body.comment
+		});
+		
+		//doorsturen naar geconnecteerde client via pubnub:
 		pubnubNetwork.publish({
 	        channel: "newshareditems",
 	        message: {
@@ -143,6 +160,12 @@ app.post('/posts/share', function(request, response) {
     response.write("ok");
     response.end();
 
+});
+
+app.get('/getshareditems', function(request, response) {
+    response.writeHead(200, {'content-type': 'text/json' });
+    response.write( JSON.stringify(shareditems) );
+    response.end('\n');
 });
 
 
