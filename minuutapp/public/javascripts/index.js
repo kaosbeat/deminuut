@@ -269,6 +269,8 @@ App.ShareView = App.MainView.extend({
 				}
 			);
 			console.log("sharing '" + this.model.get("title") + "' with comment: '" + this.$("textarea").val() + " (username:" + $("#username").val() + ")");
+			//textarea leeg maken:
+			this.$("textarea").val("");
 		}else{
 			alert("Er speelt niets op je eerste scherm!");
 		}
