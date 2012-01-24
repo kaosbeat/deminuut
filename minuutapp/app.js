@@ -83,6 +83,12 @@ app.get('/pubnubtest', function(req, res){
   });
 });
 
+/*app.get('/vidtest', function(req, res){
+  res.render('vidtest', {
+    script: 'vidtest'
+  });
+});*/
+
 //indien sockjs
 //echo.installHandlers(app, {prefix:'[/]echo'});
 
