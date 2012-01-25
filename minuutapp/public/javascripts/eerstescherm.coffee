@@ -4,9 +4,8 @@ $(document).ready ->
 		error: ->console.log("connection lost, will reconnect")
 		connect: ->console.log("connected")
 		callback: (message)->
-			console.log(message.user)
-			console.log($("#username").val())
 			if(message.username == $("#username").val())
+				console.log(message.username + " == " + $("#username").val() + ": playing video (" + message.url + ")")
 				thevideo = new Video(message.url, message.starttime, message.endtime)
 				date1=date2=0
 				thevideo.onplay(->
@@ -19,6 +18,8 @@ $(document).ready ->
 
 				thevideo.startFullWindow()
 				thevideo.play()
+			else
+				console.log(message.username + " != " + $("#username").val())
 				
 	)
 

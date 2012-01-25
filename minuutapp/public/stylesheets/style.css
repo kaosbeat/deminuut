@@ -59,7 +59,7 @@ header>#username{
 }
 
 .mainview{
-	margin-bottom: 50px;
+	margin-bottom: 60px;
 	display: none; /* standaard hiden */
 }
 
@@ -96,49 +96,77 @@ header>#username{
 }
 
 #mainview-shareditems>ul>li{
-	height: 30px;
+	position: relative;
+	height: 24px;
 }
 
 #mainview-shareditems>ul>li>.title{
-	float: left;
+	position: absolute;
 	font-weight: bold;
 }
 
 #mainview-shareditems>ul>li>.user{
-	float: right;
+	position: absolute;
 	font-weight: bold;
 	color: #898989;
 }
 
-#mainview-shareditems>ul>li>.commentandtimespan{
-	clear: both;
-	padding-top: 5px;
-}
-
-#mainview-shareditems>ul>li>.commentandtimespan>.comment{
-	float: left;
+#mainview-shareditems>ul>li>.comment{
+	position: absolute;
 	color: #898989;
 }
 
-#mainview-shareditems>ul>li>.commentandtimespan>.timespan{
-	float: right;
+#mainview-shareditems>ul>li>.timespan{
+	position: absolute;
 	color: #898989;
 }
+
+#mainview-shareditems>ul>li>.title, #mainview-shareditems>ul>li>.comment{
+	left: 5px;
+}
+
+#mainview-shareditems>ul>li>.user, #mainview-shareditems>ul>li>.timespan{
+	right: 5px;	
+}
+
+#mainview-shareditems>ul>li>.title, #mainview-shareditems>ul>li>.user{
+	top: 5px;
+}
+
+#mainview-shareditems>ul>li>.comment, #mainview-shareditems>ul>li>.timespan{
+	top: 25px;	
+}
+
 
 nav{
 	position: fixed;
 	bottom: 0px;
-	height: 40px;	
+	height: 60px;	
 	text-align: center;
 }
 
 nav>.item{
 	display: inline-block;
-	width: 60px;
-	height: 100%;
+	width: 70px;
+	height: 60px;
 	cursor: pointer;
-	padding: 10px;
 	background-color: #444444;
+	background-repeat: no-repeat;
+	background-position: center center;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+nav>#remotecontrol{
+	background-image: url("../images/remote.png");
+}
+
+nav>#share{
+	background-image: url("../images/share.png");
+}
+
+nav>#shareditems{
+	background-image: url("../images/shareditems.png");
 }
 
 #eerstescherm>span{
