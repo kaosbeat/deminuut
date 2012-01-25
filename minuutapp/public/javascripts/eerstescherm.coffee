@@ -4,7 +4,7 @@ $(document).ready ->
 		error: ->console.log("connection lost, will reconnect")
 		connect: ->console.log("connected")
 		callback: (message)->
-			console.log(message.user)
+			console.log(message.username)
 			console.log($("#username").val())
 			if(message.username == $("#username").val())
 				thevideo = new Video(message.url, message.starttime, message.endtime)
