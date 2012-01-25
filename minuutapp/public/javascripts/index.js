@@ -78,7 +78,7 @@ window.App = {
 	    PUBNUB.subscribe({
 	        channel  : "newshareditems",      // CONNECT TO THIS CHANNEL.
 	        error    : function() {        // LOST CONNECTION (auto reconnects)
-	            alert("Connection Lost. Will auto-reconnect when Online.")
+	            console.log("Connection Lost. Will auto-reconnect when Online.")
 	        },
 	        callback : function(message) { // RECEIVED A MESSAGE.
 	        	var newSharedItem = new App.SharedItem({
