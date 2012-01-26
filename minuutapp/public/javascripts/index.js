@@ -284,11 +284,21 @@ App.ShareView = App.MainView.extend({
 App.SharedItemsView = App.MainView.extend({
 	el: "#mainview-shareditems",
 	
+	events: {
+		'click .iwatchlink': 'iwatchlink_clickHandler'
+	},
+	
 	showVideo: function(sharedItem){
 		this.$("#myvideo").show();
 		console.log("showing shared item: " + sharedItem.get("url") + " from " +  sharedItem.get("starttime") + " to " + sharedItem.get("endtime") + " ms");
 		var thevideo = new Video(sharedItem.get("url"), sharedItem.get("starttime"), sharedItem.get("endtime"));
 		thevideo.play();
+		
+		if(sharedItem.get("url").indexOf("benidorm") != -1){
+			this.$(".iwatchlink").show();
+		}else{
+			this.$(".iwatchlink").hide();
+		}
 	},
 	
 	initialize: function(){
@@ -306,6 +316,10 @@ App.SharedItemsView = App.MainView.extend({
 	renderAll: function(collection){
 		this.$("ul").empty();
 		collection.forEach(this.renderItem, this);
+	},
+	
+	iwatchlink_clickHandler: function(event){
+		window.open("http://iwatch.be/archief/show-spel/benidorm-bastards");
 	}
 });
 

@@ -137,6 +137,19 @@ header>#username{
 	top: 25px;	
 }
 
+#mainview-shareditems>.iwatchlink{
+	background-image: url("../images/logo_iwatch.png");
+	background-repeat: no-repeat;
+	height: 25px;
+	width: 100%;
+	cursor: pointer;
+	display: none;
+	border-bottom: 1px solid #AAA;
+	background-color: black;
+	margin-top: -1px;
+	background-position: 10px 0px;
+}
+
 
 nav{
 	position: fixed;
