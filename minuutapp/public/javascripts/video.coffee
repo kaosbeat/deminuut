@@ -1,6 +1,6 @@
 class @Video
 	#concept of frame is unknown to html5 video; everything in seconds->milliseconds
-	jvideo=nativedom=begintime=endtime=''
+	jvideo=nativedom=begintime=endtime=_this=funct=''
 	readytoplay=playrequested=fullwin=false
 	visiblestuff=''
 	oriwidth=oriheight=0
@@ -22,92 +22,7 @@ class @Video
 				nativedom.webkitEnterFullScreen()###
 		
 
-		settimerange= ->
-			
-			nativedom.currentTime=begintime/1000
-				#duur in ms
-			
-
-			#hoe belachelijk is dat; die timeupdate updatet niet elke frame
-			#setInterval is ook methode voor SMPTE frameseeking test
-			#nativedom.addEventListener('timeupdate', ->
-			#	if(typeof endframe!= 'undefined' && endframe)
-			#		console.log(nativedom.currentTime)
-			#		if(nativedom.currentTime >= endframe/25)
-			#			nativedom.pause()
-			#)
-			#nativedom.play()
-			###console.log('endtime is: '+endtime)
-			console.log('duration is: '+nativedom.duration*1000)###
-			if(endtime<nativedom.duration*1000)
-				
-				#console.log("doe iets")
-				eenint=	setInterval(->
-						timecode=nativedom.currentTime
-						#console.log(timecode)
-						if(timecode>=endtime/1000)
-							_this.pause()
-							console.log('endtime reached')
-							clearInterval(eenint)
-					, 20)
-				#20: ms ; 25fps is 40ms
-
 		
-		initialize= ->
-			oriwidth=nativedom.videoWidth
-			oriheight=nativedom.videoHeight
-			if(typeof begintime== 'undefined' || (!begintime))
-				begintime=0 
-			if(typeof endtime== 'undefined' || (!endtime))
-				endtime=nativedom.duration * 1000
-
-			
-			
-			if(fullwin)
-				if(nativedom.videoWidth/nativedom.videoHeight>$(window).width()/$(window).height())
-					nativedom.width=$(window).width()
-					#anders kiest hij kleinste - 'auto'?
-					nativedom.height=nativedom.width*oriheight/oriwidth
-					console.log('width wins')
-					console.log (oriwidth+"/"+oriheight+"  vs   "+$(window).width()+"/"+$(window).height())
-				else
-					console.log('height wins')
-					console.log (oriwidth+"/"+oriheight+"  vs   "+$(window).width()+"/"+$(window).height())
-					nativedom.height=$(window).height()
-					nativedom.width=nativedom.height*oriwidth/oriheight
-				#assume parents of video don't take win estate
-				visiblestuff=$(':visible').not(jvideo.parents())
-				(visiblestuff.not(jvideo)).hide()
-				
-			#seeking van zodra metadata loaded werkt niet op ios; en blijkbaar bestaat hier geen event voor-> pollen
-			###deviceAgent = navigator.userAgent.toLowerCase()
-			agentID = deviceAgent.match(/(iphone|ipod|ipad)/) gewoon voor alle agents zo doen
-			if(agentID)###
-			myinterval=setInterval(->
-				ranges=nativedom.seekable
-				nrranges=ranges.length
-				i=0
-				while i< nrranges
-					console.log("seekable from: "+ranges.start(i)*1000+" to: "+ranges.end(i)*1000 )
-					if(begintime>=ranges.start(i) && begintime<=ranges.end(i)*1000)
-						clearInterval(myinterval)
-						settimerange()
-						readytoplay=true
-						#console.log('playrequested is: '+playrequested)
-						if(playrequested)
-							_this.play()
-						
-						break
-					i++
-			,20)
-
-
-
-
-			###else
-				console.log(nativedom.seekable)
-				settimerange()###
-			
 			
 
 
@@ -121,28 +36,123 @@ class @Video
 				console.log('data loaded')
 
 		nativedom.addEventListener('loadeddata', enableplaying)	###
-		hidestuff=->
-			#jvideo.hide()
-			jvideo.css({opacity:0})
+		
 		nativedom.addEventListener('seeking', hidestuff)
-		showstuff=->
-			#jvideo.show()
-			jvideo.css({opacity:1})
+		
 		nativedom.addEventListener('seeked', showstuff)
 
 
 
-		reset= ->
-			_this.toOriginalSize()
-			nativedom.removeEventListener('loadedmetadata', initialize)
-		#	nativedom.removeEventListener('loadeddata', enableplaying)
-			nativedom.removeEventListener('pause', reset)
-			nativedom.removeEventListener('seeking', hidestuff)
-			nativedom.removeEventListener('seeked', showstuff)
+		
 
 		nativedom.addEventListener('pause', reset)
 
-	
+
+	settimerange= ->
+			
+		nativedom.currentTime=begintime/1000
+			#duur in ms
+		
+
+		#hoe belachelijk is dat; die timeupdate updatet niet elke frame
+		#setInterval is ook methode voor SMPTE frameseeking test
+		#nativedom.addEventListener('timeupdate', ->
+		#	if(typeof endframe!= 'undefined' && endframe)
+		#		console.log(nativedom.currentTime)
+		#		if(nativedom.currentTime >= endframe/25)
+		#			nativedom.pause()
+		#)
+		#nativedom.play()
+		###console.log('endtime is: '+endtime)
+		console.log('duration is: '+nativedom.duration*1000)###
+		if(endtime<nativedom.duration*1000)
+			
+			#console.log("doe iets")
+			eenint=	setInterval(->
+					timecode=nativedom.currentTime
+					#console.log(timecode)
+					if(timecode>=endtime/1000)
+						_this.pause()
+						console.log('endtime reached')
+						clearInterval(eenint)
+				, 20)
+			#20: ms ; 25fps is 40ms
+	reset= ->
+		_this.toOriginalSize()
+		nativedom.removeEventListener('loadedmetadata', initialize)
+	#	nativedom.removeEventListener('loadeddata', enableplaying)
+		nativedom.removeEventListener('pause', reset)
+		nativedom.removeEventListener('seeking', hidestuff)
+		nativedom.removeEventListener('seeked', showstuff)
+		if(funct)
+			nativedom.removeEventListener('play', funct)
+			nativedom.removeEventListener('playing', funct)
+	hidestuff=->
+		#jvideo.hide()
+		jvideo.css({opacity:0})
+
+	showstuff=->
+		#jvideo.show()
+		jvideo.css({opacity:1})
+		
+	initialize= ->
+		oriwidth=nativedom.videoWidth
+		oriheight=nativedom.videoHeight
+		if(typeof begintime== 'undefined' || (!begintime))
+			begintime=0 
+		if(typeof endtime== 'undefined' || (!endtime))
+			endtime=nativedom.duration * 1000
+
+		
+		
+		if(fullwin)
+			if(nativedom.videoWidth/nativedom.videoHeight>$(window).width()/$(window).height())
+				nativedom.width=$(window).width()
+				#anders kiest hij kleinste - 'auto'?
+				nativedom.height=nativedom.width*oriheight/oriwidth
+				console.log('width wins')
+				console.log (oriwidth+"/"+oriheight+"  vs   "+$(window).width()+"/"+$(window).height())
+			else
+				console.log('height wins')
+				console.log (oriwidth+"/"+oriheight+"  vs   "+$(window).width()+"/"+$(window).height())
+				nativedom.height=$(window).height()
+				nativedom.width=nativedom.height*oriwidth/oriheight
+			#assume parents of video don't take win estate
+			visiblestuff=$(':visible').not(jvideo.parents())
+			(visiblestuff.not(jvideo)).hide()
+			
+		#seeking van zodra metadata loaded werkt niet op ios; en blijkbaar bestaat hier geen event voor-> pollen
+		###deviceAgent = navigator.userAgent.toLowerCase()
+		agentID = deviceAgent.match(/(iphone|ipod|ipad)/) gewoon voor alle agents zo doen
+		if(agentID)###
+		myinterval=setInterval(->
+			ranges=nativedom.seekable
+			nrranges=ranges.length
+			i=0
+			while i< nrranges
+				console.log("seekable from: "+ranges.start(i)*1000+" to: "+ranges.end(i)*1000 )
+				if(begintime>=ranges.start(i) && begintime<=ranges.end(i)*1000)
+					clearInterval(myinterval)
+					settimerange()
+					readytoplay=true
+					#console.log('playrequested is: '+playrequested)
+					if(playrequested)
+						_this.play()
+					
+					break
+				i++
+		,20)
+
+
+
+
+		###else
+			console.log(nativedom.seekable)
+			settimerange()###
+			
+
+	destroy: ()->
+		reset()
 
 	play:	() -> 	
 				
@@ -159,10 +169,12 @@ class @Video
 				jvideo.removeAttr("controls") #voor de ipad heb je controls nodig om te beginnen, daarna verwijder je die
 			
 	onplay: (functie)->
-		nativedom.addEventListener('play',functie)			
+		funct=functie
+		nativedom.addEventListener('play',funct)			
 				
-	onplaying: (functie)->		
-		nativedom.addEventListener('playing',functie)
+	onplaying: (functie)->
+		funct=functie	
+		nativedom.addEventListener('playing',funct)
 	pause:	() ->
 			nativedom.pause()
 			#console.log(this.getCurrentTime())

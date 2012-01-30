@@ -1,10 +1,10 @@
 
 /**
  * Variablen in het geheugen.
- * Zou eigenlijk in een DB moeten staan voor persistentie
+ * Zou eigenlijk in een DB moeten staan voor persistentie -> CHECK!
  */
-var playingOnFirstScreen = {}; //houdt bij wie er wat op het eerste scherm aant spelen is
-var shareditems = new Array(); //houdt de gedeelde items bij.
+//var playingOnFirstScreen = {}; //houdt bij wie er wat op het eerste scherm aant spelen is
+//var shareditems = new Array(); //houdt de gedeelde items bij.
 
 var benidormBasterdsShotlist = new Array();
 benidormBasterdsShotlist.push({start:0, end:33920});
@@ -28,6 +28,8 @@ var redis = require("redis"),
 client.on("error", function (err) {
     console.log("Error " + err);
 });
+
+var _und = require("underscore"); //underscore gebruiken, maar blijkbaar is "_" al gebruikt 
 
 
 var pubnub  = require("pubnub");
@@ -122,67 +124,84 @@ if (!module.parent) {
 
 app.post('/posts/playingonfirstscreen', function(request, response) {
 	var now = new Date();
-	playingOnFirstScreen[request.body.username] = {
+	/*playingOnFirstScreen[request.body.username] = {
 			url: request.body.url,
 			startdate: now
-	}
-    console.log("[" + now + "] " + request.body.username + " is playing " + request.body.url + " on the first screen.");
+	}*/
+  client.set(request.body.username, JSON.stringify({url:request.body.url, startdate: now}), function(){
+    console.log("stored first screen for: "+request.body.username);
+  });
+  client.expire(request.body.username, 3600*2*1000); //voor de gein: expire op programma; duurt max. 2u
+  console.log("[" + now + "] " + request.body.username + " is playing " + request.body.url + " on the first screen.");
     
-    response.writeHead(200, {"Content-Type": "text/plain"});
-    response.write("ok");
-    response.end();
+  response.writeHead(200, {"Content-Type": "text/plain"});
+  response.write("ok");
+  response.end();
 });
 
 
 app.post('/posts/share', function(request, response) {
-	var playObject = playingOnFirstScreen[request.body.username];
-	if(playObject != null && playObject.url == request.body.url){
-		var now = new Date();
-		var endTime = now.getTime() - playObject.startdate.getTime();
-		var startTime = 0;
-		
-		//checken of het een benidorm basterds shotje is:
-		var benidormShot = checkBenidormBastardsShotlist(endTime, request.body.url);
-		if(benidormShot !== false){
-			startTime = benidormShot.start;
-			endTime = benidormShot.end;
-		}else{
-			startTime = endTime - 1000*10; //20 seconden aftrekken
-			if(startTime < 0)
-				startTime = 0;
-		}
+	//var playObject = playingOnFirstScreen[request.body.username];
+  var playObject=null;
+  client.get(request.body.username, function(err, data){ 
+    if( !data ) {console.log("nothing appears to be playing");}
+    else {
+      playObject=JSON.parse(data);
+      if(playObject != null && playObject.url == request.body.url){
+        var now = new Date();
+        toen=new Date(playObject.startdate.toString());
+        var endTime = now.getTime() -toen.getTime();
+        var startTime = 0;
+        
+        //checken of het een benidorm basterds shotje is:
+        var benidormShot = checkBenidormBastardsShotlist(endTime, request.body.url);
+        if(benidormShot !== false){
+          startTime = benidormShot.start;
+          endTime = benidormShot.end;
+        }else{
+          startTime = endTime - 1000*10; //10 seconden aftrekken
+          if(startTime < 0)
+            startTime = 0;
+        }
 
-		console.log(request.body.username + " shares " + request.body.url + " from " + startTime + " to " + endTime + " milliseconds, with comment: " + request.body.comment)
-	
-		//toevoegen aan lokale shareditems (zodat nieuwe clients die kunnen opvragen):
-		shareditems.push({
-			user: request.body.username,
-			title: request.body.title,
-			url: request.body.url,
-			starttime: startTime,
-			endtime: endTime,
-			comment: request.body.comment
-		});
-		
-		//doorsturen naar geconnecteerde client via pubnub:
-		pubnubNetwork.publish({
-	        channel: "newshareditems",
-	        message: {
-				user: request.body.username,
-				title: request.body.title,
-				url: request.body.url,
-				starttime: startTime,
-				endtime: endTime,
-				comment: request.body.comment
-	        }
-		});
-	}
-	
-    response.writeHead(200, {"Content-Type": "text/plain"});
-    response.write("ok");
-    response.end();
+        console.log(request.body.username + " shares " + request.body.url + " from " + startTime + " to " + endTime + " milliseconds, with comment: " + request.body.comment)
+      
+        //toevoegen aan lokale shareditems (zodat nieuwe clients die kunnen opvragen):
+        /*shareditems.push({
+          user: request.body.username,
+          title: request.body.title,
+          url: request.body.url,
+          starttime: startTime,
+          endtime: endTime,
+          comment: request.body.comment
+        });*/
+        client.rpush("sharedlist", JSON.stringify({user: request.body.username, title: request.body.title,url: request.body.url,starttime: startTime, endtime: endTime,comment: request.body.comment}));
+        //enkel laatste 20 overhouden, rest deleten we
+        client.ltrim("sharedlist", -20,-1); //laatste 20
+        
+        //doorsturen naar geconnecteerde client via pubnub:
+        pubnubNetwork.publish({
+              channel: "newshareditems",
+              message: {
+                user: request.body.username,
+                title: request.body.title,
+                url: request.body.url,
+                starttime: startTime,
+                endtime: endTime,
+                comment: request.body.comment
+              }
+        });
+      }
+      
+      response.writeHead(200, {"Content-Type": "text/plain"});
+      response.write("ok");
+      response.end();
 
+    }
+  });
 });
+ 
+	
 
 function checkBenidormBastardsShotlist(time, moviename){
 	if(moviename.indexOf("benidorm") == -1)
@@ -199,21 +218,44 @@ function checkBenidormBastardsShotlist(time, moviename){
 }
 
 app.get('/getshareditems', function(request, response) {
+    
+   // response.write( JSON.stringify(shareditems) );
+  client.lrange("sharedlist", 0, -1, function(err, data){ //0->-1= entire list
+    //console.log("data: " +data);
+    var itemlist="[";
+    _und.each(data, function(ob){
+      //afzonderlijke objecten zijn al strings
+       itemlist+=ob;
+       itemlist+=",";
+    });
+    var lengte=itemlist.length;
+    itemlist=itemlist.substr(0, lengte-1)+"]";
+    //console.log("itemlist: "+itemlist );
     response.writeHead(200, {'content-type': 'text/json' });
-    response.write( JSON.stringify(shareditems) );
+    response.write(itemlist); 
     response.end('\n');
+  });
+    
 });
 
 app.get('/getwhatsplayingonfirstscreen', function(request, response) {
-	var playObject = playingOnFirstScreen[request.query.username];
-	
-    response.writeHead(200, {'content-type': 'text/json' });
-    if(playObject != null)
-    	response.write( JSON.stringify(playObject) );
-    else
-    	response.write( JSON.stringify("nothings-playing") );
-    response.end('\n');
-});
+	//var playObject = playingOnFirstScreen[request.query.username];
+  console.log("user: "+request.query.username)
+	client.get(request.query.username, function(err, data){ 
+      response.writeHead(200, {'content-type': 'text/json' });
+    /* if(playObject != null)
+    	   response.write( JSON.stringify(playObject) );
+      else
+    	 response.write( JSON.stringify("nothings-playing") );*/
+       
+      if(data)
+        response.write(data);
+      else 
+        response.write("nothings-playing");
+    
+      response.end('\n');
+  });
+})
 
 
 
