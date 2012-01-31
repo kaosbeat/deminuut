@@ -1,11 +1,7 @@
 
 /**
- * Variablen in het geheugen.
- * Zou eigenlijk in een DB moeten staan voor persistentie -> CHECK!
+ * hardcoded shotlist voor Benidorm Basterds 2x07:
  */
-//var playingOnFirstScreen = {}; //houdt bij wie er wat op het eerste scherm aant spelen is
-//var shareditems = new Array(); //houdt de gedeelde items bij.
-
 var benidormBasterdsShotlist = new Array();
 benidormBasterdsShotlist.push({start:0, end:33920});
 benidormBasterdsShotlist.push({start:33960, end:54160});
@@ -19,21 +15,29 @@ benidormBasterdsShotlist.push({start:206000, end:234280});
 benidormBasterdsShotlist.push({start:234320, end:285160});
 
 /**
- * Module dependencies.
+ * Module dependencies:
  */
-
 var express = require('express');
 var redis = require("redis");
+var _und = require("underscore"); //underscore gebruiken, maar blijkbaar is "_" al gebruikt 
+var pubnub = require("pubnub");
+
+
+/**
+ * client voor Redis opvragen:
+ */
 var redisClient = redis.createClient();
 
+/**
+ * fouten van Redis naar console schrijven:
+ */
 redisClient.on("error", function (err) {
     console.log("Error " + err);
 });
 
-var _und = require("underscore"); //underscore gebruiken, maar blijkbaar is "_" al gebruikt 
-
-
-var pubnub  = require("pubnub");
+/**
+ * Pubnub initialiseren (key is van Matthias):
+ */
 var pubnubNetwork = pubnub.init({
     publish_key   : "pub-7b2681ab-27d3-47dc-8278-15aa1d8bfb57",
     subscribe_key : "sub-6bee67b8-41be-11e1-99f4-754603d9dc6f",
@@ -64,8 +68,9 @@ echo.on('connection', function(conn) {
 var app = module.exports = express.createServer();
 
 
-// Configuration
-
+/**
+ * Configuration:
+ */
 app.configure(function(){
 	app.set('views', __dirname + '/views');
 	app.set('view engine', 'jade');
@@ -84,8 +89,10 @@ app.configure('production', function(){
 	app.use(express.errorHandler()); 
 });
 
-// Routes
 
+/**
+ * Routes:
+ */
 app.get('/', function(req, res){
 	res.render('index', {
 		script: 'index'
@@ -121,8 +128,9 @@ if (!module.parent) {
 	console.log("Express server listening on port %d", app.address().port);
 }
 
-
-
+/**
+ * POSTs:
+ */
 app.post('/posts/playingonfirstscreen', function(request, response) {
 	var now = new Date();
   
@@ -138,7 +146,6 @@ app.post('/posts/playingonfirstscreen', function(request, response) {
 	response.write("ok");
 	response.end();
 });
-
 
 app.post('/posts/share', function(request, response) {
 	var playObject=null;
@@ -189,9 +196,13 @@ app.post('/posts/share', function(request, response) {
 	    }
 	});//END redisClient.get
 });
- 
-	
 
+/**
+ * Hulpfunctie om te checken of een tijdstip in een shot van Benidorm Bastards valt:
+ * @param time: tijd in miliseconden.
+ * @param moviename: naam om te controlere of het wel om Benidorm Bastards gaat.
+ * @returns object:{start: startime in ms, end: endtime in ms}.
+ */
 function checkBenidormBastardsShotlist(time, moviename){
 	if(moviename.indexOf("benidorm") == -1)
 		return false;
@@ -206,52 +217,37 @@ function checkBenidormBastardsShotlist(time, moviename){
 	return false;
 }
 
+/**
+ * GETs:
+ */
 app.get('/getshareditems', function(request, response) {
 	redisClient.lrange("sharedlist", 0, -1, function(err, data){ //0->-1= entire list
     
-		//console.log(data);
-	    
-		var itemlist="[";
-	    _und.each(data, function(ob){
-	      //afzonderlijke objecten zijn al strings
-	       itemlist+=ob;
-	       itemlist+=",";
-	    });
-	    var lengte = itemlist.length;
-	    itemlist = itemlist.substr(0, lengte-1)+"]";
+		var itemlist = new Array();
+		 _und.each(data, function(object){
+			 itemlist.push(JSON.parse(object));
+		 });
 	
 	    //items terugsturen naar de browser:
 	    response.writeHead(200, {'content-type': 'text/json' });
-	    response.write(itemlist); 
+	    response.write(JSON.stringify(itemlist)); 
 	    response.end('\n');
   });
     
 });
 
 app.get('/getwhatsplayingonfirstscreen', function(request, response) {
-	//var playObject = playingOnFirstScreen[request.query.username];
 	console.log("user: " + request.query.username)
 	
 	redisClient.get(request.query.username, function(err, data){ 
 		response.writeHead(200, {'content-type': 'text/json' });
-		
-		/* if(playObject != null)
-    	   	response.write( JSON.stringify(playObject) );
-      	else
-    	 	response.write( JSON.stringify("nothings-playing") );*/
        
 		if(data)
 			response.write(data);
 		else 
-			response.write("nothings-playing");
+			response.write(JSON.stringify("nothings-playing")); //moet JSON zijn, anders doet $.getJSON() in de browser moeilijk
     
 		response.end('\n');
 	});
 })
-
-
-
-
-
-
 
