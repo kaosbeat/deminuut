@@ -210,6 +210,8 @@ App.RemoteControlView = App.MainView.extend({
 App.FragmentItemView = Backbone.View.extend({
 	tagName: "li",
 	
+	className: "remoteControlItem",
+	
 	events:{
 		'click':'this_click'
 	},
@@ -302,6 +304,8 @@ App.SharedItemsView = App.MainView.extend({
 	},
 	
 	initialize: function(){
+		this.sharedItemViews = new Array(); //om de views bij te houden
+		
 		App.sharedItems.bind("add", this.renderItem, this);
 		App.sharedItems.bind("reset", this.renderAll, this);
 		
@@ -309,8 +313,24 @@ App.SharedItemsView = App.MainView.extend({
 	},
 	
 	renderItem: function(model){
-		var sharedItemView = new App.SharedItemView({model: model});
-		this.$("ul").prepend(sharedItemView.render().el);
+		
+		
+		//kijken als hij nog niet bestaat:
+		var exists = false;
+		for(var i=0; i<this.sharedItemViews.length; i++){
+			if(this.sharedItemViews[i].isTheSameFragment(model)){
+				this.sharedItemViews[i].addAsChild(model);
+				exists = true;
+				break;
+			}
+		}
+		
+		//bestaat nog niet: toevoegen:
+		if(!exists){
+			var sharedItemView = new App.SharedItemView({model: model});
+			this.sharedItemViews.push(sharedItemView);
+			this.$(".shareditems").prepend(sharedItemView.render().el);
+		}
 	},
 	
 	renderAll: function(collection){
@@ -330,6 +350,8 @@ App.SharedItemsView = App.MainView.extend({
 App.SharedItemView = Backbone.View.extend({
 	tagName: "li",
 	
+	className: "shareditem",
+	
 	events:{
 		'click': 'this_clickHandler'
 	},
@@ -342,6 +364,30 @@ App.SharedItemView = Backbone.View.extend({
 		var html = this.template.tmpl(this.model.toJSON());
 		$(this.el).html(html);
 		return this;
+	},
+	
+	isTheSameFragment: function(model){
+		if(this.model.get("url") != model.get("url"))
+			return false;
+		
+		if(this.model.get("starttime") != model.get("starttime"))
+			return false;
+		
+		if(this.model.get("endtime") != model.get("endtime"))
+			return false;
+		
+		return true;
+	},
+	
+	addAsChild: function(model){
+		console.dir(this.model.attributes);
+		console.dir(model.attributes);
+		
+		
+		var sharedItemView = new App.SharedItemView({model: model});
+		//enkel toevoegen aan eerste element:
+		$(this.$(".similaritems")[0]).prepend(sharedItemView.render().el);
+		$(this.$(".similaritems")[0]).show();
 	},
 	
 	this_clickHandler: function(event){

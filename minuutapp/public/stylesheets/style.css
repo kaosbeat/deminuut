@@ -1,7 +1,7 @@
 html,body{
 	position: relative;
 	font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
-	font-size: 10px;
+	font-size: 14px;
 	color: #333333;
 	border:none;
 	background-color: #EDECED;
@@ -63,11 +63,11 @@ header>#username{
 	display: none; /* standaard hiden */
 }
 
-.mainview>ul>li{
-	font-size: 14px;
-	border-bottom: 1px solid #AAA;
+.remoteControlItem{
+	height: 14px;
 	padding: 10px;
-	cursor: pointer;
+	border-bottom: 1px solid #AAA;
+	cursor: pointer;	
 }
 
 #mainview-share{
@@ -87,54 +87,59 @@ header>#username{
 	color: #F7F7F4;
 }
 
-#mainview-share>#playsnow{
-	font-size: 14px;	
-}
-
 #mainview-shareditems>video{
 	background-color: #000;	
 }
 
-#mainview-shareditems>ul>li{
+.shareditems{
+
+}
+
+.shareditem{
 	position: relative;
-	height: 24px;
+	border-bottom: 1px solid #AAA;
+	cursor: pointer;
+	padding-top: 5px;
+	padding-left: 10px;
+	padding-right: 10px;
 }
 
-#mainview-shareditems>ul>li>.title{
-	position: absolute;
+.shareditem>.line{
+	position: relative;
+	clear: both;
+	height: 20px;
+}
+
+.shareditem>.line>.title{
+	float: left;
 	font-weight: bold;
 }
 
-#mainview-shareditems>ul>li>.user{
-	position: absolute;
+.shareditem>.line>.user{
+	float: right;
 	font-weight: bold;
+}
+
+.shareditem>.line>.comment{
+	float: left;
 	color: #898989;
 }
 
-#mainview-shareditems>ul>li>.comment{
-	position: absolute;
+.shareditem>.line>.timespan{
+	float: right;
 	color: #898989;
 }
 
-#mainview-shareditems>ul>li>.timespan{
-	position: absolute;
-	color: #898989;
+.similaritems{
+	clear: both;
+ 	display: none;
+ 	position: relative;
 }
 
-#mainview-shareditems>ul>li>.title, #mainview-shareditems>ul>li>.comment{
-	left: 5px;
-}
-
-#mainview-shareditems>ul>li>.user, #mainview-shareditems>ul>li>.timespan{
-	right: 5px;	
-}
-
-#mainview-shareditems>ul>li>.title, #mainview-shareditems>ul>li>.user{
-	top: 5px;
-}
-
-#mainview-shareditems>ul>li>.comment, #mainview-shareditems>ul>li>.timespan{
-	top: 25px;	
+.similaritems>.shareditem{
+	border-top: 1px solid #AAA;
+	border-bottom: none;
+	padding-right: 0px;
 }
 
 #mainview-shareditems>.iwatchlink{
@@ -149,6 +154,8 @@ header>#username{
 	margin-top: -1px;
 	background-position: 10px 0px;
 }
+
+
 
 
 nav{
