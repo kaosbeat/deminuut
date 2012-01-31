@@ -310,7 +310,7 @@ App.SharedItemsView = App.MainView.extend({
 	
 	renderItem: function(model){
 		var sharedItemView = new App.SharedItemView({model: model});
-		this.$("ul").append(sharedItemView.render().el);
+		this.$("ul").prepend(sharedItemView.render().el);
 	},
 	
 	renderAll: function(collection){
