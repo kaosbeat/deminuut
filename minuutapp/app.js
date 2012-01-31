@@ -23,9 +23,10 @@ benidormBasterdsShotlist.push({start:234320, end:285160});
  */
 
 var express = require('express');
-var redis = require("redis"),
-		client = redis.createClient();
-client.on("error", function (err) {
+var redis = require("redis");
+var redisClient = redis.createClient();
+
+redisClient.on("error", function (err) {
     console.log("Error " + err);
 });
 
@@ -66,42 +67,42 @@ var app = module.exports = express.createServer();
 // Configuration
 
 app.configure(function(){
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'jade');
-  app.use(express.bodyParser());
-  app.use(express.methodOverride());
-  app.use(require('stylus').middleware({ src: __dirname + '/public' }));
-  app.use(app.router);
-  app.use(express.static(__dirname + '/public'));
+	app.set('views', __dirname + '/views');
+	app.set('view engine', 'jade');
+	app.use(express.bodyParser());
+	app.use(express.methodOverride());
+	app.use(require('stylus').middleware({ src: __dirname + '/public' }));
+	app.use(app.router);
+	app.use(express.static(__dirname + '/public'));
 });
 
 app.configure('development', function(){
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+	app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
 });
 
 app.configure('production', function(){
-  app.use(express.errorHandler()); 
+	app.use(express.errorHandler()); 
 });
 
 // Routes
 
 app.get('/', function(req, res){
-  res.render('index', {
-    script: 'index'
-  });
+	res.render('index', {
+		script: 'index'
+	});
 });
 
 app.get('/eerstescherm', function(req, res){
-  console.log(req.query);
-  res.render('eerstescherm', {
-    script: 'eerstescherm'
-  });
+	console.log(req.query);
+	res.render('eerstescherm', {
+		script: 'eerstescherm'
+	});
 });
 
 app.get('/pubnubtest', function(req, res){
-  res.render('pubnubtest', {
-    script: 'pubnubtest'
-  });
+	res.render('pubnubtest', {
+		script: 'pubnubtest'
+	});
 });
 
 /*app.get('/vidtest', function(req, res){
@@ -116,89 +117,77 @@ app.get('/pubnubtest', function(req, res){
 // Only listen on $ node app.js
 
 if (!module.parent) {
-  app.listen(3000);
-  console.log("Express server listening on port %d", app.address().port);
+	app.listen(3000);
+	console.log("Express server listening on port %d", app.address().port);
 }
 
 
 
 app.post('/posts/playingonfirstscreen', function(request, response) {
 	var now = new Date();
-	/*playingOnFirstScreen[request.body.username] = {
-			url: request.body.url,
-			startdate: now
-	}*/
-  client.set(request.body.username, JSON.stringify({url:request.body.url, startdate: now}), function(){
-    console.log("stored first screen for: "+request.body.username);
-  });
-  client.expire(request.body.username, 3600*2*1000); //voor de gein: expire op programma; duurt max. 2u
-  console.log("[" + now + "] " + request.body.username + " is playing " + request.body.url + " on the first screen.");
+  
+	redisClient.set(request.body.username, JSON.stringify({url:request.body.url, startdateMiliseconds: now.getTime()}), function(){
+		console.log("stored first screen for: "+request.body.username);
+	});
+	redisClient.expire(request.body.username, 3600*2*1000); //voor de gein: expire op programma; duurt max. 2u
+	
+	console.log("[" + now + "] " + request.body.username + " is playing " + request.body.url + " on the first screen.");
     
-  response.writeHead(200, {"Content-Type": "text/plain"});
-  response.write("ok");
-  response.end();
+	//"ok" terugsturen naar browser:
+	response.writeHead(200, {"Content-Type": "text/plain"});
+	response.write("ok");
+	response.end();
 });
 
 
 app.post('/posts/share', function(request, response) {
-	//var playObject = playingOnFirstScreen[request.body.username];
-  var playObject=null;
-  client.get(request.body.username, function(err, data){ 
-    if( !data ) {console.log("nothing appears to be playing");}
-    else {
-      playObject=JSON.parse(data);
-      if(playObject != null && playObject.url == request.body.url){
-        var now = new Date();
-        toen=new Date(playObject.startdate.toString());
-        var endTime = now.getTime() -toen.getTime();
-        var startTime = 0;
+	var playObject=null;
+	redisClient.get(request.body.username, function(err, data){ 
+		if( !data ) {console.log("nothing appears to be playing");}
+		else{
+			playObject=JSON.parse(data);
+			if(playObject != null && playObject.url == request.body.url){
+				var now = new Date();
+				toenMiliseconds = playObject.startdateMiliseconds;
+				var endTime = now.getTime() - toenMiliseconds;
+				var startTime = 0;
         
-        //checken of het een benidorm basterds shotje is:
-        var benidormShot = checkBenidormBastardsShotlist(endTime, request.body.url);
-        if(benidormShot !== false){
-          startTime = benidormShot.start;
-          endTime = benidormShot.end;
-        }else{
-          startTime = endTime - 1000*10; //10 seconden aftrekken
-          if(startTime < 0)
-            startTime = 0;
-        }
+				//checken of het een benidorm basterds shotje is:
+				var benidormShot = checkBenidormBastardsShotlist(endTime, request.body.url);
+				if(benidormShot !== false){
+					startTime = benidormShot.start;
+					endTime = benidormShot.end;
+				}else{
+					startTime = endTime - 1000*10; //10 seconden aftrekken
+					if(startTime < 0)
+						startTime = 0;
+				}
 
-        console.log(request.body.username + " shares " + request.body.url + " from " + startTime + " to " + endTime + " milliseconds, with comment: " + request.body.comment)
+				console.log(request.body.username + " shares " + request.body.url + " from " + startTime + " to " + endTime + " milliseconds, with comment: " + request.body.comment)
       
-        //toevoegen aan lokale shareditems (zodat nieuwe clients die kunnen opvragen):
-        /*shareditems.push({
-          user: request.body.username,
-          title: request.body.title,
-          url: request.body.url,
-          starttime: startTime,
-          endtime: endTime,
-          comment: request.body.comment
-        });*/
-        client.rpush("sharedlist", JSON.stringify({user: request.body.username, title: request.body.title,url: request.body.url,starttime: startTime, endtime: endTime,comment: request.body.comment}));
-        //enkel laatste 20 overhouden, rest deleten we
-        client.ltrim("sharedlist", -20,-1); //laatste 20
+				redisClient.rpush("sharedlist", JSON.stringify({user: request.body.username, title: request.body.title,url: request.body.url,starttime: startTime, endtime: endTime,comment: request.body.comment}));
+				//enkel laatste 20 overhouden, rest deleten we
+				redisClient.ltrim("sharedlist", -20,-1); //laatste 20
         
-        //doorsturen naar geconnecteerde client via pubnub:
-        pubnubNetwork.publish({
-              channel: "newshareditems",
-              message: {
-                user: request.body.username,
-                title: request.body.title,
-                url: request.body.url,
-                starttime: startTime,
-                endtime: endTime,
-                comment: request.body.comment
-              }
-        });
-      }
+		        //doorsturen naar geconnecteerde client via pubnub:
+		        pubnubNetwork.publish({
+		              channel: "newshareditems",
+		              message: {
+		                user: request.body.username,
+		                title: request.body.title,
+		                url: request.body.url,
+		                starttime: startTime,
+		                endtime: endTime,
+		                comment: request.body.comment
+		              }
+		        });
+			}
       
-      response.writeHead(200, {"Content-Type": "text/plain"});
-      response.write("ok");
-      response.end();
-
-    }
-  });
+			response.writeHead(200, {"Content-Type": "text/plain"});
+			response.write("ok");
+			response.end();
+	    }
+	});//END redisClient.get
 });
  
 	
@@ -218,69 +207,49 @@ function checkBenidormBastardsShotlist(time, moviename){
 }
 
 app.get('/getshareditems', function(request, response) {
+	redisClient.lrange("sharedlist", 0, -1, function(err, data){ //0->-1= entire list
     
-   // response.write( JSON.stringify(shareditems) );
-  client.lrange("sharedlist", 0, -1, function(err, data){ //0->-1= entire list
-    //console.log("data: " +data);
-    var itemlist="[";
-    _und.each(data, function(ob){
-      //afzonderlijke objecten zijn al strings
-       itemlist+=ob;
-       itemlist+=",";
-    });
-    var lengte=itemlist.length;
-    itemlist=itemlist.substr(0, lengte-1)+"]";
-    //console.log("itemlist: "+itemlist );
-    response.writeHead(200, {'content-type': 'text/json' });
-    response.write(itemlist); 
-    response.end('\n');
+		//console.log(data);
+	    
+		var itemlist="[";
+	    _und.each(data, function(ob){
+	      //afzonderlijke objecten zijn al strings
+	       itemlist+=ob;
+	       itemlist+=",";
+	    });
+	    var lengte = itemlist.length;
+	    itemlist = itemlist.substr(0, lengte-1)+"]";
+	
+	    //items terugsturen naar de browser:
+	    response.writeHead(200, {'content-type': 'text/json' });
+	    response.write(itemlist); 
+	    response.end('\n');
   });
     
 });
 
 app.get('/getwhatsplayingonfirstscreen', function(request, response) {
 	//var playObject = playingOnFirstScreen[request.query.username];
-  console.log("user: "+request.query.username)
-	client.get(request.query.username, function(err, data){ 
-      response.writeHead(200, {'content-type': 'text/json' });
-    /* if(playObject != null)
-    	   response.write( JSON.stringify(playObject) );
-      else
-    	 response.write( JSON.stringify("nothings-playing") );*/
+	console.log("user: " + request.query.username)
+	
+	redisClient.get(request.query.username, function(err, data){ 
+		response.writeHead(200, {'content-type': 'text/json' });
+		
+		/* if(playObject != null)
+    	   	response.write( JSON.stringify(playObject) );
+      	else
+    	 	response.write( JSON.stringify("nothings-playing") );*/
        
-      if(data)
-        response.write(data);
-      else 
-        response.write("nothings-playing");
+		if(data)
+			response.write(data);
+		else 
+			response.write("nothings-playing");
     
-      response.end('\n');
-  });
+		response.end('\n');
+	});
 })
 
 
-
-
-/*
-//listen for remote button post
-//
-//en post naar pubnub
-app.post('/', function(req, res){
-    console.log(req.body.user);
-		console.log(req.body.video);
-		client.hmset("vid:2", "starttime", "44455362", "user", req.body.user, "video", req.body.video);
-    network.publish({
-            channel  : "vtm",
-            message  : {"video" : req.body.video},
-            callback : function(info){
-                if (!info[0]) console.log("Failed Message Delivery")
-
-                console.log(info);
-            }
-    });
-		
-});
-
-*/
 
 
 
