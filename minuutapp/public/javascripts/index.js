@@ -44,7 +44,7 @@ window.App = {
 		
 		//Add some fragments to the fragmentList (kan van de server komen, maar zit hier nu statisch n):
 		App.fragments.add([
-		    {title: "Benidorm Bastards", url:"http://www.neat.be/down/benidorm.bastards.2x07.m4v"},
+		    {title: "Benidorm Bastards 2 afl.07", url:"http://www.neat.be/down/benidorm.bastards.2x07.m4v"},
 			{title: "Big Buck Bunny", url:"http://ftp.akl.lt/Video/Big_Buck_Bunny/big_buck_bunny_480p_h264.mov"},
 			{title: "Sintel", url:"http://ftp.akl.lt/Video/Sintel/sintel-2048-surround.mp4"},
 			{title: "Elephants Dream", url:"http://ftp.akl.lt/Video/Elephants_Dream/Elephants_Dream_1024-h264-st-aac.mov"},
@@ -249,12 +249,28 @@ App.ShareView = App.MainView.extend({
 		'click button': 'sharebutton_clickHandler'
 	},
 	
+	show: function(){
+		App.MainView.prototype.show.call(this); //super
+		
+		if(this.model){
+			this.$("textarea").val(this.model.get("title"));
+			this.$("textarea").focus();
+			this.$("textarea").select();
+			
+		}
+	},
+	
 	updateCurrentlyPlaying: function(fragment){
 		this.model = fragment;
-		if(this.model != null)
+		if(this.model != null){
 			this.$("#currentlyplaying").html(fragment.get("title"));
-		else
+			this.$("textarea").val(fragment.get("title"));
+			this.$("textarea").focus();
+			this.$("textarea").select();
+		}else{
 			this.$("#currentlyplaying").html("");
+			this.$("textarea").val("");
+		}
 	},
 	
 	sharebutton_clickHandler: function(event){
@@ -290,6 +306,12 @@ App.SharedItemsView = App.MainView.extend({
 		'click .iwatchlink': 'iwatchlink_clickHandler'
 	},
 	
+	show: function(){
+		App.MainView.prototype.show.call(this); //super
+		
+		this.hideVideo();
+	},	
+	
 	showVideo: function(sharedItem){
 		this.$("#myvideo").show();
 		console.log("showing shared item: " + sharedItem.get("url") + " from " +  sharedItem.get("starttime") + " to " + sharedItem.get("endtime") + " ms");
@@ -303,6 +325,11 @@ App.SharedItemsView = App.MainView.extend({
 		}
 	},
 	
+	hideVideo: function(){
+		this.$("#myvideo").hide();
+		this.$(".iwatchlink").hide();
+	},
+	
 	initialize: function(){
 		this.sharedItemViews = new Array(); //om de views bij te houden
 		
@@ -313,13 +340,11 @@ App.SharedItemsView = App.MainView.extend({
 	},
 	
 	renderItem: function(model){
-		
-		
 		//kijken als hij nog niet bestaat:
 		var exists = false;
 		for(var i=0; i<this.sharedItemViews.length; i++){
 			if(this.sharedItemViews[i].isTheSameFragment(model)){
-				this.sharedItemViews[i].addAsChild(model);
+				this.sharedItemViews[i].addSimilarItem(model);
 				exists = true;
 				break;
 			}
@@ -339,7 +364,7 @@ App.SharedItemsView = App.MainView.extend({
 	},
 	
 	iwatchlink_clickHandler: function(event){
-		window.open("http://iwatch.be/archief/show-spel/benidorm-bastards");
+		window.open("http://iwatch.be/archief/show-spel/benidorm-bastards/benidorm-bastards-2-afl07-zo-20112011");
 	}
 });
 
@@ -353,16 +378,21 @@ App.SharedItemView = Backbone.View.extend({
 	className: "shareditem",
 	
 	events:{
-		'click': 'this_clickHandler'
+		'click .shared': 'shared_clickHandler',
+		'click .mainitem>.user': 'this_clickHandler',
+		'click .mainitem>.image': 'this_clickHandler',
+		'click .mainitem>.comment': 'this_clickHandler'
 	},
 	
 	initialize: function(){
 		this.template = $("#shareditem-template");
+		this.timesshared = 0;
 	},
 	
 	render: function(){
 		var html = this.template.tmpl(this.model.toJSON());
 		$(this.el).html(html);
+		this.$(".shared").hide();
 		return this;
 	},
 	
@@ -379,22 +409,46 @@ App.SharedItemView = Backbone.View.extend({
 		return true;
 	},
 	
-	addAsChild: function(model){
-		console.dir(this.model.attributes);
-		console.dir(model.attributes);
+	addSimilarItem: function(model){
+		this.timesshared++;
+		this.updateTimesShared();
 		
-		
-		var sharedItemView = new App.SharedItemView({model: model});
-		//enkel toevoegen aan eerste element:
-		$(this.$(".similaritems")[0]).prepend(sharedItemView.render().el);
-		$(this.$(".similaritems")[0]).show();
+		var similarItemView = new App.SimilarItemView({model: model});
+		this.$(".similaritems").prepend(similarItemView.render().el);
+	},
+	
+	updateTimesShared: function(){
+		this.$(".timesshared").html(this.timesshared);
+		this.$(".shared").show();
 	},
 	
 	this_clickHandler: function(event){
 		console.log("will show shared item: "  + this.model.get("url"));
 		App.sharedItemsView.showVideo(this.model);
+	},
+	
+	shared_clickHandler: function(event){
+		this.$(".similaritems").is(":visible") ? this.$(".similaritems").hide() : this.$(".similaritems").show();
 	}
 });
+
+App.SimilarItemView = Backbone.View.extend({
+	tagName: "li",
+	
+	className: "similaritem",
+	
+	initialize: function(){
+		this.template = $("#similaritem-template");
+	},
+	
+	render: function(){
+		var html = this.template.tmpl(this.model.toJSON());
+		$(this.el).html(html);
+		return this;
+	}
+});
+	
+	
 
 
 //================ MODELS ==================

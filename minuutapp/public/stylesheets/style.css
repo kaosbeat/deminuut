@@ -4,7 +4,7 @@ html,body{
 	font-size: 14px;
 	color: #333333;
 	border:none;
-	background-color: #EDECED;
+	background-color: #FFFFFF;
 }
 
 input,select,textarea{
@@ -97,49 +97,64 @@ header>#username{
 
 .shareditem{
 	position: relative;
-	border-bottom: 1px solid #AAA;
-	cursor: pointer;
-	padding-top: 5px;
-	padding-left: 10px;
-	padding-right: 10px;
 }
 
-.shareditem>.line{
+.shareditem>.mainitem{
 	position: relative;
-	clear: both;
-	height: 20px;
+	border-bottom: 1px solid #e0e0e0;
+	cursor: pointer;
+	height: 50px;
 }
 
-.shareditem>.line>.title{
+.shareditem>.mainitem>.image{
+	position: relative;
+	width: 60px;
+	height: 50px;
+	background-color: #000;
 	float: left;
+	margin-right: 4px;
+}
+
+.shareditem>.mainitem>.user, .similaritem>.user{
 	font-weight: bold;
+	color: #666d74;
 }
 
-.shareditem>.line>.user{
-	float: right;
+.shareditem>.mainitem>.comment, .similaritem>.comment{
 	font-weight: bold;
+	color: #000;
+	font-size: 12px;
 }
 
-.shareditem>.line>.comment{
-	float: left;
-	color: #898989;
+.shareditem>.mainitem>.shared{
+	cursor: pointer;
+	position: absolute;
+	left: 64px;
+	top: 33px;
+	font-size: 12px;
+	text-decoration: underline;
 }
 
-.shareditem>.line>.timespan{
-	float: right;
-	color: #898989;
+.shareditem>.mainitem>.title{
+	position: absolute;
+	right: 4px;
+	top: 33px;
+	font-size: 12px;
+	color: #666d74;
 }
 
 .similaritems{
 	clear: both;
  	display: none;
  	position: relative;
+ 	margin-left: 30px;
 }
 
-.similaritems>.shareditem{
-	border-top: 1px solid #AAA;
-	border-bottom: none;
-	padding-right: 0px;
+.similaritems>.similaritem{
+	border-bottom: 1px solid #e0e0e0;
+ 	height: 25px;
+ 	padding-left: 4px;
+ 	line-height: 25px;
 }
 
 #mainview-shareditems>.iwatchlink{

@@ -1,14 +1,24 @@
 //SAM: geen idee hoe ik dit in de header kan krijgen, want is specifiek voor deze pagina
 //en niet voor alle pagina's (swat, het werkt hier ook)
 script(id="shareditem-template", type="text/x-jquery-tmpl")
-	.line
-		.title ${title}
-		.user ${user}
-	.line
-		.comment ${comment}
-		.timespan
-			${starttime} to ${endtime} ms
+	.mainitem
+		.image
+		span.user
+			${user}:
+		span.comment
+			${comment}
+		div.shared
+			span.timesshared
+			span &nbsp;maal gedeeld
+		div.title uit ${title}
 	ul.similaritems
+	
+script(id="similaritem-template", type="text/x-jquery-tmpl")
+	span &nbsp;-&nbsp;
+	span.user
+		${user}:
+	span.comment
+		${comment}
 
 header De Minuut
 	input#username(type="input", value="matthias")
